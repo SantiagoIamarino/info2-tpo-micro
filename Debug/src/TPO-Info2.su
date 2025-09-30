@@ -1,0 +1,15 @@
+../src/TPO-Info2.cpp:42:6:void delay()	16	static
+../src/TPO-Info2.cpp:46:6:void log_debug(uint8_t*, int)	16	static
+../src/TPO-Info2.cpp:50:14:char* i16toa(int16_t, char*)	40	static
+../src/TPO-Info2.cpp:60:13:void log_acc(int16_t, int16_t, int16_t)	72	static
+../src/TPO-Info2.cpp:70:6:bool mpuInit()	16	static
+../src/TPO-Info2.cpp:113:6:bool maxProbe()	56	static
+../src/TPO-Info2.cpp:133:13:bool waitResetClear()	16	static
+../src/TPO-Info2.cpp:142:6:bool maxInit()	8	static
+../src/TPO-Info2.cpp:185:13:bool maxAvail(uint8_t*)	24	static
+../src/TPO-Info2.cpp:193:6:void maxReadLoopOnce()	96	static
+../src/TPO-Info2.cpp:223:13:void maxDumpRegs()	192	static
+../src/TPO-Info2.cpp:239:5:int main()	16	static
+../src/TPO-Info2.cpp:262:6:void tick()	8	static
+../src/TPO-Info2.cpp:287:1:void __static_initialization_and_destruction_0()	8	static
+../src/TPO-Info2.cpp:287:1:cpp)	8	static

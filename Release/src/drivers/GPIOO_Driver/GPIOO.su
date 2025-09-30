@@ -1,0 +1,3 @@
+../src/drivers/GPIOO_Driver/GPIOO.cpp:15:1:GPIOO::~GPIOO()	0	static
+../src/drivers/GPIOO_Driver/GPIOO.cpp:15:1:virtual GPIOO::~GPIOO()	8	static
+../src/drivers/GPIOO_Driver/GPIOO.cpp:10:1:GPIOO::GPIOO()	0	static
