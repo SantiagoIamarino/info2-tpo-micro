@@ -1,0 +1,37 @@
+# Archivos de compilación
+*.o
+*.d
+*.map
+*.axf
+*.elf
+*.bin
+*.hex
+
+# Directorios de build generados por MCUXpresso
+Debug/
+Release/
+build*/
+
+# Archivos temporales y de logs
+*.log
+*.tmp
+
+# Archivos de configuración local de Eclipse/MCUXpresso
+.settings/
+.cproject
+.project
+*.launch
+.metadata/
+*.swp
+*.swo
+
+# Archivos de indexado de Eclipse
+*.idx
+*.pydevproject
+
+# Archivos de sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de backup
+*~
