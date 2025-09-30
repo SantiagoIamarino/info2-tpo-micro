@@ -16,19 +16,6 @@ build*/
 *.log
 *.tmp
 
-# Archivos de configuración local de Eclipse/MCUXpresso
-.settings/
-.cproject
-.project
-*.launch
-.metadata/
-*.swp
-*.swo
-
-# Archivos de indexado de Eclipse
-*.idx
-*.pydevproject
-
 # Archivos de sistema
 .DS_Store
 Thumbs.db
