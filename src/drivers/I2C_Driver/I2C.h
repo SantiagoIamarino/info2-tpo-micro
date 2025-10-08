@@ -1,5 +1,9 @@
 #pragma once
-#include "Defines.h"
+#include "tipos.h"
+#include "LPC845.h"
+#include "Hardware.h"
+#include "GPIO.h"
+
 
 /**> Index for the IOCON Register Port0 */
 const uint8_t IOCON_INDEX_PIO0[] = { 17,11,6,5,4,3,16,15,4,13,8,7,2,1,18,10,9,0,30,29,28,27,26,25,24,23,22,21,20,0,0,35};

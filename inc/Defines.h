@@ -11,7 +11,10 @@
 #include "CALLBACK.h"
 #include "TIMER.h"
 #include "UART0.h"
+#include "GRAL.h"
 #include "I2C.h"
+#include "MAX.h"
+#include "MPU.h"
 
 #ifndef __NOP
   #ifdef __GNUC__
