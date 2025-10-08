@@ -11,7 +11,6 @@ I2C I2C_ACC(13, 14, 100);
 
 MPU::MPU() {
 	this->initiated = false;
-	this->init();
 }
 
 bool MPU::init()

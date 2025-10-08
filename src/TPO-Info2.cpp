@@ -14,6 +14,9 @@ int main(void)
 
 	log_debug((uint8_t*)"Initializing...\r\n", 0);
 
+	MAX_SENSOR.init();
+	MPU_ACC.init();
+
     while (1) {
 
     }

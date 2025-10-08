@@ -11,7 +11,6 @@ I2C I2C_MAX(10, 11, 100);
 
 MAX::MAX() {
 	initiated = false;
-	this->init();
 }
 
 bool MAX::probe()
