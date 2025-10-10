@@ -1,4 +1,4 @@
 ../src/TPO-Info2.cpp:12:5:int main()	8	static
-../src/TPO-Info2.cpp:22:6:void tick()	104	static
-../src/TPO-Info2.cpp:47:1:void __static_initialization_and_destruction_0()	8	static
-../src/TPO-Info2.cpp:47:1:cpp)	8	static
+../src/TPO-Info2.cpp:27:6:void tick()	8	static
+../src/TPO-Info2.cpp:37:1:void __static_initialization_and_destruction_0()	8	static
+../src/TPO-Info2.cpp:37:1:cpp)	8	static

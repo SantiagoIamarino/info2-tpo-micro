@@ -41,10 +41,6 @@ bool MPU::init()
 			continue;
 		}
 
-		char msg[32];
-		int n = sprintf(msg, "WHO: %lu \r\n", (unsigned long)who);
-		log_debug((uint8_t*)msg, n);
-
 		if (who == 0x68) {
 			I2C_ACC.writeReg(MPU_ADDR, REG_PWR_MGMT_1, 0x00);
 			log_debug((uint8_t*)"Init MPU OK\r\n", 0);

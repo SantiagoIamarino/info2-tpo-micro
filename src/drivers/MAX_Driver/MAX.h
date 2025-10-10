@@ -14,6 +14,8 @@
 #include "UART0.h"
 #include "I2C.h"
 #include "GRAL.h"
+#include "CALLBACK.h"
+#include "TIMER.h"
 
 static const uint8_t MAX_ADDR         = 0x57;
 
@@ -29,7 +31,6 @@ static const uint8_t MAX_ADDR         = 0x57;
 #define REG_SPO2_CONFIG   0x0A
 #define REG_LED1_RED      0x0C
 #define REG_LED2_IR       0x0D
-#define REG_LED3_IR       0x0D
 #define REG_MULTI_LED_1   0x11   // SLOT1
 #define REG_MULTI_LED_2   0x12   // SLOT2
 #define REG_PART_ID       0xFF
@@ -37,13 +38,21 @@ static const uint8_t MAX_ADDR         = 0x57;
 class MAX {
 public:
 	MAX();
-
-	bool initiated;
-
-	bool probe();
 	bool init(void);
 	bool read(uint32_t* red, uint32_t* ir, uint8_t* avail_out);
+	static void tick_read();
 	virtual ~MAX();
+private:
+	bool initiated;
+	bool filtro_initiated;
+	int32_t filtro_dc;
+	int32_t filtro_valor;
+	uint8_t* pulso_state;
+
+	bool probe();
+	int32_t pulso_filtro(int32_t ir_val);
+
+	static MAX* s_self;
 };
 
 #endif /* DRIVERS_MAX_H_ */
