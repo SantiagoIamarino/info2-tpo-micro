@@ -7,15 +7,32 @@
 
 #include "MAX.h"
 
-#define MAX_FREC_LECTURA 10 // en ms
+#define FREC_TICK_READ 100 // en ms
+#define FREC_MUESTREO_EN_MS 10
+#define MAX_LECTURAS_POR_TICK 24
 
 I2C I2C_MAX(10, 11, 100);
 MAX* MAX::s_self = nullptr;
 TIMER* tick_MAX;
 
+#define PULSO_SIN_CONTACTO_UMBRAL 1500
+#define MUESTRAS_ESTABILIZACION_UMBRAL_MS 3000
+
+#define PULSO_SIN_CONTACTO 0
+#define PULSO_ESTABILIZANDO 1
+#define PULSO_BUSCANDO_PICO 2
+#define PULSO_BUSCANDO_PISO 3
+#define PULSO_PISO_DETECTADO 4
+
+#define MUESTRAS_ESTABILIZACION_UMBRAL (MUESTRAS_ESTABILIZACION_UMBRAL_MS / FREC_MUESTREO_EN_MS)
+
 MAX::MAX() {
 	this->initiated = false;
 	this->filtro_initiated = false;
+	this->pulso_state = PULSO_SIN_CONTACTO;
+	this->pulso_state_reset_counter = 0;
+	this->pulso_state_switch_counter = 0;
+	this->pulso_state_switch_back_counter = 0;
 }
 
 bool MAX::probe()
@@ -92,8 +109,8 @@ bool MAX::init(void) {
     this->initiated = true;
     s_self = this;
 
-    // MAX tick timer (lee cada MAX_FREC_LECTURA)
-    tick_MAX = new TIMER(10, MAX_FREC_LECTURA, MAX::tick_read);
+    // MAX tick timer (lee cada FREC_TICK_READ)
+    tick_MAX = new TIMER(10, FREC_TICK_READ, MAX::tick_read);
 
     return true;
 }
@@ -121,73 +138,105 @@ int32_t MAX::pulso_filtro(int32_t ir_val){
 	return this->filtro_valor;
 }
 
+
 void MAX::tick_read(void) {
 	if (!s_self) return;
 
 	uint32_t red, ir;
-	uint8_t avail=0;
-	if (s_self->read(&red, &ir, &avail)) {
-
-		if (ir < 1500) { // reflexion muy baja, sin contacto con piel probablemente
-			log_debug((uint8_t*)"SENSOR MAX SIN CONTACTO\r\n", 0);
-			s_self->filtro_initiated = false;
-			s_self->pulso_state = "SIN_CONTACTO";
-			return;
-		}
-
-		uint32_t valor_filtrado = s_self->pulso_filtro(ir);
-
-		switch(s_self->pulso_state){
-			case "SIN_CONTACTO": // sensor MAX sin contacto con la piel
-				break;
-			case "ESTABILIZANDO": // espero TIEMPO_ESTABILIZACION desde que se detecta el dedo
-				break;
-			case "BUSCANDO_PICO": // espera hasta que se detecte el pico (cambio de tendencia, maximo y luego hacia ABAJO)
-				break;
-			case: "BUSCANDO_PISO": // espera hasta que se detecte un piso (cambio de tendencia, MINIMO y luego hacia ARRIBA)
-				break;
-			case: "PISO_DETECTADO": // se guarda el tiempo que tomo entre PICO y PISO, se calculan las PPM y se vuelve a el estado BUSCANDO_PISO
-				break;
-			default:
-				break;
-		}
-
-		char line[64];
-		int n = snprintf(line, sizeof(line), "IR=%ld IR_FILTRADO=%ld (avail=%u)\r\n",
-						 (long)ir, (long)valor_actual, avail);
-		if (n>0) log_debug((uint8_t*)line, n);
+	if (s_self->read(&red, &ir)) {
 	}
 	else {
 			log_debug((uint8_t*)"MAX read error\r\n", 0);
 	}
 }
 
+void MAX::buscar_picos(uint32_t* ir) {
+	/*int32_t valor_filtrado = pulso_filtro((uint32_t)*ir);
+	char line[64];
+	int n = snprintf(line, sizeof(line), "IR=%ld IR_FILTRADO=%ld (avail=%u)\r\n",
+					 (long)*ir, (long)valor_filtrado, avail);
+	if (n>0) log_debug((uint8_t*)line, n);*/
 
-bool MAX::read(uint32_t* red, uint32_t* ir, uint8_t* avail_out) {
-    uint8_t wr=0, rd=0;
-    if (!I2C_MAX.readReg(MAX_ADDR, REG_FIFO_WR_PTR, wr)) return false;  // FIFO_WR_PTR
-    if (!I2C_MAX.readReg(MAX_ADDR, REG_FIFO_RD_PTR, rd)) return false;  // FIFO_RD_PTR
-    uint8_t avail = (wr - rd) & 0x1F;                    // profundidad FIFO=32
-    if (avail_out) *avail_out = avail;
-    if (avail == 0) return false;
+	switch(s_self->pulso_state){
+		case PULSO_SIN_CONTACTO: // sensor MAX sin contacto con la piel
+			if(*ir > PULSO_SIN_CONTACTO_UMBRAL) {
+				s_self->pulso_state = PULSO_ESTABILIZANDO;return;
+				s_self->pulso_state_switch_counter++;
+				if(s_self->pulso_state_switch_counter == 5) { // avanza a partir de las 5 muestras con datos
+					s_self->pulso_state_switch_counter = 0;
+					s_self->pulso_state = PULSO_ESTABILIZANDO;
+				}
+			} else {
+				s_self->pulso_state_switch_counter = 0;
+			}
+			break;
+		case PULSO_ESTABILIZANDO: // espero MUESTRAS_ESTABILIZACION desde que se detecta el dedo
+			s_self->pulso_state_switch_counter++;
+			if(s_self->pulso_state_switch_counter == MUESTRAS_ESTABILIZACION_UMBRAL) {
+				s_self->pulso_state_switch_counter = 0;
+				s_self->pulso_state = PULSO_BUSCANDO_PICO;
+			}
+			break;
+		case PULSO_BUSCANDO_PICO: // espera hasta que se detecte el pico (cambio de tendencia, maximo y luego hacia ABAJO)
+			log_debug((uint8_t*)"BUSCANDO PICO STATE\r\n", 0);
+			//uint32_t valor_filtrado = s_self->pulso_filtro(ir);
+			/*if(s_self->pulso_valor_anterior == 0) {
+				s_self->pulso_valor_anterior = valor_filtrado; break;
+			}*/
 
-    uint8_t buf[32*6];
-    uint16_t nbytes = (uint16_t)avail * 6;
-    if (!I2C_MAX.readBytes(MAX_ADDR, REG_FIFO_DATA, buf, nbytes)) return false;; // FIFO_DATA
+			break;
+		case PULSO_BUSCANDO_PISO: // espera hasta que se detecte un piso (cambio de tendencia, MINIMO y luego hacia ARRIBA)
+			break;
+		case PULSO_PISO_DETECTADO: // se guarda el tiempo que tomo entre PICO y PISO, se calculan las PPM y se vuelve a el estado BUSCANDO_PISO
+			break;
+		default:
+			break;
+	}
+}
 
-    // 18 bits por canal, mask 0x3FFFF. Orden: RED luego IR (SpO2)
-    uint32_t r = ((uint32_t)buf[0] << 16) | ((uint32_t)buf[1] << 8) | buf[2];
-    uint32_t i = ((uint32_t)buf[3] << 16) | ((uint32_t)buf[4] << 8) | buf[5];
-    r &= 0x3FFFF; i &= 0x3FFFF;
-    *red = r; *ir = i;
+bool MAX::read(uint32_t* red, uint32_t* ir) {
+	// 1) ver cuantas muestras pendientes hay
+	uint8_t wr=0, rd=0;
+	if (!I2C_MAX.readReg(MAX_ADDR, REG_FIFO_WR_PTR, wr)) return false;
+	if (!I2C_MAX.readReg(MAX_ADDR, REG_FIFO_RD_PTR, rd)) return false;
+	uint8_t avail = (wr - rd) & 0x1F;
+	if (avail == 0) return false;
+
+	// 2) limitar burst para no bloquear mucho
+	uint8_t n = (avail > MAX_LECTURAS_POR_TICK) ? MAX_LECTURAS_POR_TICK : avail;
+
+	// 3) leer n muestras
+	uint8_t buf[6 * MAX_LECTURAS_POR_TICK];
+	if (!I2C_MAX.readBytes(MAX_ADDR, REG_FIFO_DATA, buf, 6*n)) return false;
+    for (uint8_t i = 0; i < n; ++i) {
+        const uint8_t* p = &buf[i*6];
+        *red = (((uint32_t)p[0]<<16)|((uint32_t)p[1]<<8)|p[2]) & 0x3FFFF;
+        *ir  = (((uint32_t)p[3]<<16)|((uint32_t)p[4]<<8)|p[5]) & 0x3FFFF;
+
+        if (*ir < PULSO_SIN_CONTACTO_UMBRAL) { // reflexion muy baja, sin contacto con piel probablemente
+			if(s_self->pulso_state != PULSO_SIN_CONTACTO) {
+				s_self->pulso_state_reset_counter++;
+				if(s_self->pulso_state_reset_counter == 5) { // avanza a partir de las 5 muestras con datos
+					s_self->pulso_state = PULSO_SIN_CONTACTO;
+				}
+				continue;
+			}
+
+			log_debug((uint8_t*)"SENSOR MAX SIN CONTACTO\r\n", 0);
+			s_self->filtro_initiated = false;
+			s_self->pulso_state = PULSO_SIN_CONTACTO;
+			s_self->pulso_state_reset_counter = 0;
+			s_self->pulso_state_switch_counter = 0;
+			s_self->pulso_state_switch_back_counter = 0;
+			continue;
+		} else {
+			s_self->pulso_state_reset_counter = 0;
+		}
+
+        this->buscar_picos(ir);
+    }
+
     return true;
-
-
-	// usar la última (la más nueva)
-	const uint8_t* p = &buf[(avail-1)*6];
-	*red = (((uint32_t)p[0] << 16) | ((uint32_t)p[1] << 8) | p[2]) & 0x3FFFF;
-	*ir  = (((uint32_t)p[3] << 16) | ((uint32_t)p[4] << 8) | p[5]) & 0x3FFFF;
-	return true;
 }
 
 MAX::~MAX() {

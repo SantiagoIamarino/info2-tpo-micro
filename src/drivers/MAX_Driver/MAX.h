@@ -39,7 +39,7 @@ class MAX {
 public:
 	MAX();
 	bool init(void);
-	bool read(uint32_t* red, uint32_t* ir, uint8_t* avail_out);
+	bool read(uint32_t* red, uint32_t* ir);
 	static void tick_read();
 	virtual ~MAX();
 private:
@@ -47,11 +47,14 @@ private:
 	bool filtro_initiated;
 	int32_t filtro_dc;
 	int32_t filtro_valor;
-	uint8_t* pulso_state;
+	uint8_t pulso_state;
+	uint32_t pulso_state_reset_counter;
+	uint32_t pulso_state_switch_counter;
+	uint32_t pulso_state_switch_back_counter;
 
 	bool probe();
 	int32_t pulso_filtro(int32_t ir_val);
-
+	void buscar_picos(uint32_t* ir);
 	static MAX* s_self;
 };
 

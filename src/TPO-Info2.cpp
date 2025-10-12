@@ -1,8 +1,8 @@
 #include "Defines.h"
 
-UART0	Uart0(9600);
+UART0	Uart0(115200);
 void tick();
-//TIMER t(10,1000,tick);
+//TIMER t(10,3000,tick);
 
 Gpio LED_VERDE(PIN_LED_VERDE, OUTPUT);
 MAX MAX_SENSOR;
@@ -29,9 +29,9 @@ void tick() {
 	static uint8_t led=0;
 	led^=1; LED_VERDE.Set(led);
 
-	if(MPU_ACC.initiated) {
+	/*if(MPU_ACC.initiated) {
 		MPU_ACC.read();
-	}
+	}*/
 
 
 }
