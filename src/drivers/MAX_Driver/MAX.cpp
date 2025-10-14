@@ -7,32 +7,45 @@
 
 #include "MAX.h"
 
-#define FREC_TICK_READ 100 // en ms
+#define FREC_TICK_READ 50 // en ms
 #define FREC_MUESTREO_EN_MS 10
-#define MAX_LECTURAS_POR_TICK 24
+#define MAX_LECTURAS_POR_TICK 12
+#define PULSO_PICO_NO_VAL 60000 // valor fuera de rango, es primera busqueda de pico
 
 I2C I2C_MAX(10, 11, 100);
 MAX* MAX::s_self = nullptr;
 TIMER* tick_MAX;
 
 #define PULSO_SIN_CONTACTO_UMBRAL 1500
-#define MUESTRAS_ESTABILIZACION_UMBRAL_MS 3000
+#define MUESTRAS_ESTABILIZACION_UMBRAL_MS 6000
 
-#define PULSO_SIN_CONTACTO 0
-#define PULSO_ESTABILIZANDO 1
-#define PULSO_BUSCANDO_PICO 2
-#define PULSO_BUSCANDO_PISO 3
-#define PULSO_PISO_DETECTADO 4
+static constexpr uint16_t PULSO_SIN_CONTACTO = 0;
+static constexpr uint16_t PULSO_ESTABILIZANDO = 1;
+static constexpr uint16_t PULSO_BUSCANDO_PICO = 2;
+static constexpr uint16_t PULSO_PICO_DETECTADO = 3;
+static constexpr uint16_t DEBOUNCE_N      = 10;   // muestras consecutivas confirmando la pendiente
+static constexpr uint16_t REFRACTORY_MS   = 300; // no aceptar otro pico antes de 300 ms (max aprox 200 ppm)
+static constexpr uint16_t RR_MIN_MS       = 300; // 200 bpm
+static constexpr uint32_t RR_MAX_MS       = 1500; // 40 bpm
+static constexpr uint16_t MIN_AMP         = 200;  // amplitud minima picos (en unidades del filtrado)
+static constexpr uint16_t MIN_THR         = 80;   // piso del umbral dinámico
 
 #define MUESTRAS_ESTABILIZACION_UMBRAL (MUESTRAS_ESTABILIZACION_UMBRAL_MS / FREC_MUESTREO_EN_MS)
 
 MAX::MAX() {
+	this->reset_vars();
 	this->initiated = false;
+}
+
+void MAX::reset_vars(void) {
 	this->filtro_initiated = false;
+	this->pulso_ppm_actual = 0;
 	this->pulso_state = PULSO_SIN_CONTACTO;
 	this->pulso_state_reset_counter = 0;
 	this->pulso_state_switch_counter = 0;
 	this->pulso_state_switch_back_counter = 0;
+	this->buscando_picos = false;
+	this->pulso_t_desde_ult_pico = PULSO_PICO_NO_VAL;
 }
 
 bool MAX::probe()
@@ -89,7 +102,7 @@ bool MAX::init(void) {
     // 2) FIFO: sample avg=4 (2<<5), rollover=1 (1<<4), almost_full=0x0F
     I2C_MAX.writeReg(MAX_ADDR, REG_FIFO_CONFIG, (2<<5) | (1<<4) | 0x0F);
 
-    // 3) SPO2: range=0 (2048nA), sample rate=100Hz (3<<2), pulse width=411us/18-bit (3)
+    // 3) SPO2: range=0 (8192nA), sample rate=100Hz (3<<2), pulse width=411us/18-bit (3)
     I2C_MAX.writeReg(MAX_ADDR, REG_SPO2_CONFIG, (2<<5) | (3<<2) | 3);
 
     // 4) Corriente LEDs
@@ -143,24 +156,77 @@ void MAX::tick_read(void) {
 	if (!s_self) return;
 
 	uint32_t red, ir;
-	if (s_self->read(&red, &ir)) {
-	}
-	else {
-			log_debug((uint8_t*)"MAX read error\r\n", 0);
+	if (!s_self->read(&red, &ir)) {
+		log_debug((uint8_t*)"MAX read error\r\n", 0);
 	}
 }
 
-void MAX::buscar_picos(uint32_t* ir) {
-	/*int32_t valor_filtrado = pulso_filtro((uint32_t)*ir);
-	char line[64];
-	int n = snprintf(line, sizeof(line), "IR=%ld IR_FILTRADO=%ld (avail=%u)\r\n",
-					 (long)*ir, (long)valor_filtrado, avail);
-	if (n>0) log_debug((uint8_t*)line, n);*/
+void MAX::buscar_picos(uint32_t* ir){
+	if(!s_self->buscando_picos){
+		s_self->pulso_valor_previo = 0;
+		s_self->pulso_sube_cnt = 0;
+		s_self->pulso_baja_cnt = 0;
+		s_self->buscando_picos = true;
+		s_self->pulso_subio = false;
+	}
 
+	const int32_t valor_filtrado = pulso_filtro((uint32_t)*ir);
+
+	s_self->pulso_t_desde_ult_pico += FREC_MUESTREO_EN_MS; // aumento tiempo desde el ultimo pico (en ms)
+
+	// Derivada simple (signo de la pendiente)
+	const int32_t df = valor_filtrado - s_self->pulso_valor_previo;
+	s_self->pulso_valor_previo = valor_filtrado;
+
+	if (df > 0) {            // sube
+		if (s_self->pulso_sube_cnt < 255) s_self->pulso_sube_cnt++;
+		if (s_self->pulso_sube_cnt >= DEBOUNCE_N) { // estuvo subiendo por DEBOUNCE_N muestras
+			s_self->pulso_subio = true;
+		}
+		if (s_self->pulso_baja_cnt > 0){ // estaba bajando hasta la ultima muestra, guardo minimo (valle)
+		    s_self->pulso_valle = s_self->pulso_valor_previo;
+		}
+		s_self->pulso_baja_cnt = 0;
+	} else if (df < 0) {     // baja
+		if (s_self->pulso_baja_cnt < 255) s_self->pulso_baja_cnt++;
+		s_self->pulso_sube_cnt = 0;
+	}
+
+	// Refractario: no permitir otro pico demasiado cerca
+	if (s_self->pulso_t_desde_ult_pico < REFRACTORY_MS) return;
+
+	if (s_self->pulso_baja_cnt >= DEBOUNCE_N && s_self->pulso_subio) { // estuvo a la baja por DEBOUNCE_N muestras y antes habia subido (paso un pico)
+
+		if(s_self->pulso_t_desde_ult_pico >= PULSO_PICO_NO_VAL) { // es el primer pico encontrado, reinicio y busco proximo
+			s_self->pulso_sube_cnt = 0;
+			s_self->pulso_baja_cnt = 0;
+			s_self->pulso_t_desde_ult_pico = 0;
+			s_self->pulso_subio = false;
+			return;
+		}
+
+		int32_t amp = s_self->pulso_valor_previo - s_self->pulso_valle;
+		amp = (amp < 0 ? -amp : amp); // valor absoluto de la amplitud
+
+		if (
+				s_self->pulso_t_desde_ult_pico >= RR_MIN_MS && s_self->pulso_t_desde_ult_pico <= RR_MAX_MS // esta en valores razonables?
+				&& amp >= MIN_AMP // pico demasiado chico, ignoro
+			)
+		{
+			s_self->pulso_state = PULSO_PICO_DETECTADO;
+		} else if(s_self->pulso_t_desde_ult_pico >= RR_MAX_MS){ // se paso, descarto
+			s_self->pulso_sube_cnt = 0;
+			s_self->pulso_baja_cnt = 0;
+			s_self->pulso_t_desde_ult_pico = 0;
+			s_self->pulso_subio = false;
+		}
+	}
+}
+
+void MAX::pulso_maq_estados(uint32_t* ir) {
 	switch(s_self->pulso_state){
 		case PULSO_SIN_CONTACTO: // sensor MAX sin contacto con la piel
 			if(*ir > PULSO_SIN_CONTACTO_UMBRAL) {
-				s_self->pulso_state = PULSO_ESTABILIZANDO;return;
 				s_self->pulso_state_switch_counter++;
 				if(s_self->pulso_state_switch_counter == 5) { // avanza a partir de las 5 muestras con datos
 					s_self->pulso_state_switch_counter = 0;
@@ -178,17 +244,35 @@ void MAX::buscar_picos(uint32_t* ir) {
 			}
 			break;
 		case PULSO_BUSCANDO_PICO: // espera hasta que se detecte el pico (cambio de tendencia, maximo y luego hacia ABAJO)
-			log_debug((uint8_t*)"BUSCANDO PICO STATE\r\n", 0);
-			//uint32_t valor_filtrado = s_self->pulso_filtro(ir);
-			/*if(s_self->pulso_valor_anterior == 0) {
-				s_self->pulso_valor_anterior = valor_filtrado; break;
-			}*/
+			s_self->buscar_picos(ir);
+			break;
+		case PULSO_PICO_DETECTADO: { // se guarda el tiempo que tomo entre PICOS, se calculan las PPM y se vuelve a el estado BUSCANDO_PICO
+
+			const uint32_t ppm_inst = (uint16_t)(60000u / s_self->pulso_t_desde_ult_pico); // 60.000 ms / (tiempo entre picos)
+			int32_t dif_ultimo_ppm = (int32_t)ppm_inst - (int32_t)s_self->pulso_ppm_actual;
+			dif_ultimo_ppm = (dif_ultimo_ppm < 0) ? (-dif_ultimo_ppm) : dif_ultimo_ppm; // valor absoluto
+
+			if(s_self->pulso_ppm_actual == 0) { // 1era muestra de pulso
+				s_self->pulso_ppm_actual = ppm_inst;
+			} else if(dif_ultimo_ppm > (s_self->pulso_ppm_actual / 4)) { // si la diferencia entre mediciones es mas del 25% -> DESCARTAR
+				s_self->pulso_ppm_actual = s_self->pulso_ppm_actual; // mantengo valor anterior
+			} else { // 2da o mas, tomo promedio
+				s_self->pulso_ppm_actual = (uint16_t)((s_self->pulso_ppm_actual * 3 + ppm_inst) / 4);
+			}
+			s_self->pulso_sube_cnt = 0;
+			s_self->pulso_baja_cnt = 0;
+			s_self->pulso_t_desde_ult_pico = 0;
+			s_self->pulso_subio = false;
+
+			char line[64];
+			int line_n = snprintf(line, sizeof(line), "PPM=%ld\r\n",
+							 (long)s_self->pulso_ppm_actual);
+			if (line_n>0) log_debug((uint8_t*)line, line_n);
+
+			s_self->pulso_state = PULSO_BUSCANDO_PICO;
 
 			break;
-		case PULSO_BUSCANDO_PISO: // espera hasta que se detecte un piso (cambio de tendencia, MINIMO y luego hacia ARRIBA)
-			break;
-		case PULSO_PISO_DETECTADO: // se guarda el tiempo que tomo entre PICO y PISO, se calculan las PPM y se vuelve a el estado BUSCANDO_PISO
-			break;
+		}
 		default:
 			break;
 	}
@@ -206,7 +290,7 @@ bool MAX::read(uint32_t* red, uint32_t* ir) {
 	uint8_t n = (avail > MAX_LECTURAS_POR_TICK) ? MAX_LECTURAS_POR_TICK : avail;
 
 	// 3) leer n muestras
-	uint8_t buf[6 * MAX_LECTURAS_POR_TICK];
+	static uint8_t buf[6 * MAX_LECTURAS_POR_TICK];
 	if (!I2C_MAX.readBytes(MAX_ADDR, REG_FIFO_DATA, buf, 6*n)) return false;
     for (uint8_t i = 0; i < n; ++i) {
         const uint8_t* p = &buf[i*6];
@@ -222,18 +306,13 @@ bool MAX::read(uint32_t* red, uint32_t* ir) {
 				continue;
 			}
 
-			log_debug((uint8_t*)"SENSOR MAX SIN CONTACTO\r\n", 0);
-			s_self->filtro_initiated = false;
-			s_self->pulso_state = PULSO_SIN_CONTACTO;
-			s_self->pulso_state_reset_counter = 0;
-			s_self->pulso_state_switch_counter = 0;
-			s_self->pulso_state_switch_back_counter = 0;
+			s_self->reset_vars();
 			continue;
 		} else {
 			s_self->pulso_state_reset_counter = 0;
 		}
 
-        this->buscar_picos(ir);
+        this->pulso_maq_estados(ir);
     }
 
     return true;

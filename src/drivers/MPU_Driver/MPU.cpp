@@ -47,6 +47,8 @@ bool MPU::init()
 			this->initiated = true;
 			return true;
 		}
+
+		log_debug((uint8_t*)"Init MPU FAIL\r\n", 0);
 	}
 
 	log_debug((uint8_t*)"Init MPU FAIL\r\n", 0);

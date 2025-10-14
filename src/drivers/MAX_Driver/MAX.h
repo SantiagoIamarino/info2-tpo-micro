@@ -48,12 +48,22 @@ private:
 	int32_t filtro_dc;
 	int32_t filtro_valor;
 	uint8_t pulso_state;
+	uint16_t pulso_ppm_actual;
 	uint32_t pulso_state_reset_counter;
 	uint32_t pulso_state_switch_counter;
 	uint32_t pulso_state_switch_back_counter;
+	bool buscando_picos;
+	uint32_t pulso_t_desde_ult_pico;
+	uint16_t pulso_valor_previo;
+	uint16_t pulso_sube_cnt;
+	uint16_t pulso_baja_cnt;
+	uint16_t pulso_valle;
+	bool pulso_subio;
 
-	bool probe();
+	void reset_vars(void);
+	bool probe(void);
 	int32_t pulso_filtro(int32_t ir_val);
+	void pulso_maq_estados(uint32_t* ir);
 	void buscar_picos(uint32_t* ir);
 	static MAX* s_self;
 };
