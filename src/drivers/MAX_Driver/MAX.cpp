@@ -50,13 +50,13 @@ void MAX::reset_vars(void) {
 
 bool MAX::probe()
 {
-    // ¿está en 0x57?
+    // ¿esta en MAX_ADDR?
     if (!I2C_MAX.scanOne(MAX_ADDR)) {
         log_debug((uint8_t*)"MAX not found at 0x57\r\n",0);
         return false;
     }
 
-    // Leer PART ID (0xFF) -> 0x15
+    // Leer PART ID
     uint8_t partid = 0;
     if (!I2C_MAX.readReg(MAX_ADDR, REG_PART_ID, partid)) {
         log_debug((uint8_t*)"MAX read PARTID fail\r\n",0);
