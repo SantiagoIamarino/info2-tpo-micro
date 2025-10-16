@@ -2,7 +2,7 @@
 
 UART0	Uart0(115200);
 void tick();
-TIMER t(10,3000,tick);
+//TIMER t(10,3000,tick);
 
 Gpio LED_VERDE(PIN_LED_VERDE, OUTPUT);
 MAX MAX_SENSOR;
@@ -14,12 +14,12 @@ int main(void)
 
 	log_debug((uint8_t*)"Initializing...\r\n", 0);
 
-	//MAX_SENSOR.init();
+	MAX_SENSOR.init();
 	MPU_ACC.init();
 
+	// obtengo configuracion desde la PC
+
     while (1) {
-
-
 
     }
 }

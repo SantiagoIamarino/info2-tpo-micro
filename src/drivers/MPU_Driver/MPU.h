@@ -14,6 +14,8 @@
 #include "UART0.h"
 #include "I2C.h"
 #include "GRAL.h"
+#include "CALLBACK.h"
+#include "TIMER.h"
 
 #define MPU_ADDR 			0x68
 #define REG_PWR_MGMT_1 		0x6B
@@ -26,11 +28,31 @@ public:
 
 	bool init();
 	void read();
+	static void tick_read();
+	void procesarMuestra(int16_t ax, int16_t ay, int16_t az);
 	char* i16toa(int16_t v, char* p);
 	void log_acc(int16_t ax, int16_t ay, int16_t az);
 
+	uint8_t posible_caida_counter = 0;
+	bool caida_detectada = false;
+
 	bool initiated;
+	static MPU* s_self;
 	virtual ~MPU();
+
+private:
+	int32_t ax_anterior = 0, ay_anterior = 0, az_anterior = 0;
+
+	uint32_t sum_abs = 0;   // Σ |ax_ac|+|ay_ac|+|az_ac|
+	uint16_t n = 0;
+
+	// Score expuesto (promedio por muestra en la última ventana)
+	uint32_t valor_acc_actual = 0;
+
+	uint8_t  estado_movimiento = 0;
+	uint16_t estuvo_quieto_ms = 0;
+	uint16_t estuvo_activo_ms = 0;
+
 };
 
 #endif /* DRIVERS_MPU_H_ */
