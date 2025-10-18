@@ -15,6 +15,8 @@
 #include "I2C.h"
 #include "MAX.h"
 #include "MPU.h"
+#include "PCCON.h"
+#include "suenio.h"
 
 #ifndef __NOP
   #ifdef __GNUC__

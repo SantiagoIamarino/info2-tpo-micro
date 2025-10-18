@@ -33,10 +33,12 @@ SUBDIRS := \
 src \
 src/UTILS/CALLBACK \
 src/UTILS/GRAL \
+src/UTILS/SUENIO_MAQ_ESTADOS \
 src/drivers/GPIO_Driver \
 src/drivers/I2C_Driver \
 src/drivers/MAX_Driver \
 src/drivers/MPU_Driver \
+src/drivers/PC_CON_DRIVER \
 src/drivers/SYSTICK_Driver \
 src/drivers/TIMERS_Driver \
 src/drivers/UART_Driver \

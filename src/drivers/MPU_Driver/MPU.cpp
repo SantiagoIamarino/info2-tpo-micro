@@ -98,16 +98,10 @@ void MPU::procesarMuestra(int16_t ax, int16_t ay, int16_t az) {
 	this->ay_anterior = ay;
 	this->az_anterior = az;
 
-    //log_debug((uint8_t*)"valores AC: ", 0);
-    //this->log_acc(ax_ac, ay_ac, az_ac);
-
     // valor absoluto de las picos y sumo todos los ejes
     uint32_t sabs = (uint32_t)((ax_ac < 0 ? -ax_ac : ax_ac)
                              + (ay_ac < 0 ? -ay_ac : ay_ac)
                              + (az_ac < 0 ? -az_ac : az_ac));
-
-    //log_debug((uint8_t*)"VALOR ABS SUMA: ", 0);
-	//this->log_acc(sabs, sabs, sabs);
 
     sum_abs += sabs;
 
@@ -117,7 +111,6 @@ void MPU::procesarMuestra(int16_t ax, int16_t ay, int16_t az) {
 
         switch (estado_movimiento) {
             case ACC_ESTADO_QUIETO:
-                log_debug((uint8_t*)"ACC_ESTADO_QUIETO\r\n", 0);
                 if (valor_acc_actual > SCORE_ACTIVO) {
                     estuvo_activo_ms += 1000;
                     if (estuvo_activo_ms >= 1000) { estado_movimiento = 2; estuvo_activo_ms = 0; } // exigir ≥1 s
@@ -129,7 +122,6 @@ void MPU::procesarMuestra(int16_t ax, int16_t ay, int16_t az) {
                 }
                 break;
             case ACC_ESTADO_MICRO:
-            	log_debug((uint8_t*)"ACC_ESTADO_MICRO\r\n", 0);
                 if (valor_acc_actual > SCORE_ACTIVO) {
                     estado_movimiento = ACC_ESTADO_MOVIMIENTO;
                 } else if (valor_acc_actual <= SCORE_QUIETO) {
@@ -141,7 +133,6 @@ void MPU::procesarMuestra(int16_t ax, int16_t ay, int16_t az) {
                 }
                 break;
             case ACC_ESTADO_MOVIMIENTO:
-            	log_debug((uint8_t*)"ACC_ESTADO_MOVIMIENTO\r\n", 0);
                 if (valor_acc_actual <= SCORE_QUIETO) {
                     estuvo_quieto_ms += 1000;
                     if (estuvo_quieto_ms >= 2000) { estado_movimiento = 1; estuvo_quieto_ms = 0; }
@@ -155,7 +146,6 @@ void MPU::procesarMuestra(int16_t ax, int16_t ay, int16_t az) {
         if(this->valor_acc_actual >= SCORE_POSIBLE_CAIDA) {
         	if(this->posible_caida_counter++ == MIN_POSIBLE_CAIDA_MUESTRAS) {
         		this->caida_detectada = true;
-        		log_debug((uint8_t*)"POSIBLE CAIDA DETECTADA\r\n", 0);
         	}
         } else {
         	this->posible_caida_counter = 0;

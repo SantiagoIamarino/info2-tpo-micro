@@ -2,10 +2,10 @@
 ../src/drivers/MPU_Driver/MPU.cpp:37:6:bool MPU::init()	32	static
 ../src/drivers/MPU_Driver/MPU.cpp:82:6:static void MPU::tick_read()	8	static
 ../src/drivers/MPU_Driver/MPU.cpp:90:6:void MPU::procesarMuestra(int16_t, int16_t, int16_t)	48	static
-../src/drivers/MPU_Driver/MPU.cpp:171:6:void MPU::read()	56	static
-../src/drivers/MPU_Driver/MPU.cpp:184:7:char* MPU::i16toa(int16_t, char*)	48	static
-../src/drivers/MPU_Driver/MPU.cpp:194:6:void MPU::log_acc(int16_t, int16_t, int16_t)	88	static
-../src/drivers/MPU_Driver/MPU.cpp:204:1:MPU::~MPU()	16	static
-../src/drivers/MPU_Driver/MPU.cpp:204:1:virtual MPU::~MPU()	16	static
-../src/drivers/MPU_Driver/MPU.cpp:206:1:void __static_initialization_and_destruction_0()	8	static
-../src/drivers/MPU_Driver/MPU.cpp:206:1:cpp)	8	static
+../src/drivers/MPU_Driver/MPU.cpp:161:6:void MPU::read()	56	static
+../src/drivers/MPU_Driver/MPU.cpp:174:7:char* MPU::i16toa(int16_t, char*)	48	static
+../src/drivers/MPU_Driver/MPU.cpp:184:6:void MPU::log_acc(int16_t, int16_t, int16_t)	88	static
+../src/drivers/MPU_Driver/MPU.cpp:194:1:MPU::~MPU()	16	static
+../src/drivers/MPU_Driver/MPU.cpp:194:1:virtual MPU::~MPU()	16	static
+../src/drivers/MPU_Driver/MPU.cpp:196:1:void __static_initialization_and_destruction_0()	8	static
+../src/drivers/MPU_Driver/MPU.cpp:196:1:cpp)	8	static

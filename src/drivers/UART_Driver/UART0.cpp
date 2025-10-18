@@ -8,6 +8,7 @@
 #include "Defines.h"
 
 extern UART0	Uart0;
+extern PC_CON   PC_CONNECTION;
 
 /*****************************************************************************
 ** Function name:		UART0_IRQHandler
@@ -29,9 +30,9 @@ void UART0_IRQHandler (void) // se ejecuta en cada interrupcion
 		//RX
 		Uart0.PushRx((uint8_t)USART0->RXDAT);
 
-		// Reenvio lo que recibo
+		// Proceso bytes recibidos
 		int32_t Temporal = Uart0.PopRx();
-		Uart0.PushTx((uint8_t)Temporal);
+		PC_CONNECTION.Procesar_Mensaje(Temporal);
 	}
 
 	if(Int & (1 << 2)) // termino de escribir un byte

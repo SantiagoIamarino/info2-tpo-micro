@@ -1,12 +1,10 @@
 #include "Defines.h"
 
-UART0	Uart0(115200);
-void tick();
-//TIMER t(10,3000,tick);
-
 Gpio LED_VERDE(PIN_LED_VERDE, OUTPUT);
 MAX MAX_SENSOR;
 MPU MPU_ACC;
+PC_CON PC_CONNECTION;
+
 
 
 int main(void)
@@ -16,22 +14,12 @@ int main(void)
 
 	MAX_SENSOR.init();
 	MPU_ACC.init();
+	PC_CONNECTION.init();
 
-	// obtengo configuracion desde la PC
+	// obtengo configuracion desde la PC (horas_suenio, alarma_on, luz_on)
+
 
     while (1) {
 
     }
-}
-
-void tick() {
-
-	static uint8_t led=0;
-	led^=1; LED_VERDE.Set(led);
-
-	if(MPU_ACC.initiated) {
-		MPU_ACC.read();
-	}
-
-
 }
