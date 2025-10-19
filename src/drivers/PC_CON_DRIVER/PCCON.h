@@ -17,6 +17,13 @@
 #include "CALLBACK.h"
 #include "TIMER.h"
 #include "UART0.h"
+#include "GRAL.h"
+
+struct SuenioCFG {
+    uint8_t horas_suenio;
+    bool alarma_on;
+    bool luz_on;
+};
 
 class PC_CON {
 public:
@@ -27,16 +34,14 @@ public:
 	virtual ~PC_CON();
 
 	bool initiated = false;
+	bool Leer_Resp(uint8_t* resp_a_buscar, bool debug);
+	bool Leer_Resp_Con_Reintentos(uint8_t* resp_a_buscar, uint32_t max_intentos, bool debug);
+	void Enviar_Comando(uint8_t* cmd);
 
-	uint32_t cmd_index = 0;
-	bool start_found = false;
-	bool cmd_found = false;
-	uint8_t* cmd_a_buscar = nullptr;
-	uint32_t attempts = 0;
+	bool cfg_obtenida = false;
+	bool ack_recibido = false;
 
-	CallbackFn cb = nullptr;
-
-	void Procesar_Mensaje(uint8_t byte);
+	bool Obtener_Configuracion(SuenioCFG* cfg);
 };
 
 #endif /* DRIVERS_PC_CON_DRIVER_PCCON_H_ */

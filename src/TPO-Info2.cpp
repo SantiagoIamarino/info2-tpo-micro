@@ -5,6 +5,7 @@ MAX MAX_SENSOR;
 MPU MPU_ACC;
 PC_CON PC_CONNECTION;
 
+SuenioCFG suenio_config;
 
 
 int main(void)
@@ -17,7 +18,9 @@ int main(void)
 	PC_CONNECTION.init();
 
 	// obtengo configuracion desde la PC (horas_suenio, alarma_on, luz_on)
-
+	if(!PC_CONNECTION.Obtener_Configuracion(&suenio_config)) {
+		suenio_config = { 8, true, true }; // uso config default si falla
+	}
 
     while (1) {
 

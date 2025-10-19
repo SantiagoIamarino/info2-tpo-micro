@@ -29,10 +29,6 @@ void UART0_IRQHandler (void) // se ejecuta en cada interrupcion
 	{
 		//RX
 		Uart0.PushRx((uint8_t)USART0->RXDAT);
-
-		// Proceso bytes recibidos
-		int32_t Temporal = Uart0.PopRx();
-		PC_CONNECTION.Procesar_Mensaje(Temporal);
 	}
 
 	if(Int & (1 << 2)) // termino de escribir un byte
@@ -150,6 +146,11 @@ void UART0::PushRx(uint8_t dato)
 
 	FIFO.RX.Indice_in ++;
 	FIFO.RX.Indice_in %= UART0_TAMANIO_COLA_RX; // reinicia a 0 si alcanza UART0_TAMANIO_COLA_RX
+	FIFO.RX.Esta_Leyendo = true;
+}
+
+bool UART0::Esta_Leyendo(void) {
+	return FIFO.RX.Esta_Leyendo;
 }
 
 int32_t UART0::PopRx( void )
@@ -161,6 +162,9 @@ int32_t UART0::PopRx( void )
 		dato = (int32_t) FIFO.RX.Buffer[FIFO.RX.Indice_out];
 		FIFO.RX.Indice_out ++;
 		FIFO.RX.Indice_out %= UART0_TAMANIO_COLA_RX; // reinicia a 0 si alcanza UART0_TAMANIO_COLA_RX
+	} else {
+		FIFO.RX.Esta_Leyendo = false;
 	}
+
 	return dato;
 }

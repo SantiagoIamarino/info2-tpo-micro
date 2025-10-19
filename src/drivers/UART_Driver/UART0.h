@@ -8,7 +8,7 @@
 #ifndef UART_DRIVER_UART0_H_
 #define UART_DRIVER_UART0_H_
 
-#define		UART0_TAMANIO_COLA_RX					5
+#define		UART0_TAMANIO_COLA_RX					300
 #define		UART0_TAMANIO_COLA_TX					300
 
 #define UART0CLKSEL                               *(( uint32_t  * )0x40048090u)
@@ -39,9 +39,9 @@ typedef struct
 
 class UART0 {
 private:
-	UART0_Struct	FIFO;
 
 public:
+	UART0_Struct	FIFO;
 	UART0(uint32_t baudrate);
 	virtual ~UART0();
 
@@ -50,6 +50,7 @@ public:
 	int32_t PopTx( void );
 	void PushRx(uint8_t Dato);
 	int32_t PopRx( void );
+	bool Esta_Leyendo(void);
 
 	uint32_t CADENAS_Strlen(uint8_t *datos);
 };

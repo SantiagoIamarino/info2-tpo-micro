@@ -1,8 +1,10 @@
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:12:1:PC_CON::PC_CON()	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:17:6:void init_cb(PC_CON*)	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:21:6:void PC_CON::init()	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:33:6:void PC_CON::Procesar_Mensaje(uint8_t)	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:70:1:PC_CON::~PC_CON()	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:70:1:virtual PC_CON::~PC_CON()	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:72:1:void __static_initialization_and_destruction_0()	8	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:72:1:cpp)	8	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:15:1:PC_CON::PC_CON()	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:20:6:bool PC_CON::Leer_Resp(uint8_t*, bool)	88	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:63:6:bool PC_CON::Leer_Resp_Con_Reintentos(uint8_t*, uint32_t, bool)	32	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:79:6:void PC_CON::init()	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:87:6:void PC_CON::Enviar_Comando(uint8_t*)	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:91:6:bool PC_CON::Obtener_Configuracion(SuenioCFG*)	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:113:1:PC_CON::~PC_CON()	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:113:1:virtual PC_CON::~PC_CON()	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:115:1:void __static_initialization_and_destruction_0()	8	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:115:1:cpp)	8	static
