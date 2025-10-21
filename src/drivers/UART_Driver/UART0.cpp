@@ -22,13 +22,13 @@ extern PC_CON   PC_CONNECTION;
 void UART0_IRQHandler (void) // se ejecuta en cada interrupcion
 {
 
-	const uint32_t	Int = USART0->STAT;
+	uint32_t	Int = USART0->STAT;
 
-
-	if(Int & (1 << 0)) // termino de leer un byte
-	{
-		//RX
-		Uart0.PushRx((uint8_t)USART0->RXDAT);
+	// RX: limpiar hasta que no haya mas
+	while (Int & (1u<<0)) {
+		uint8_t b = (uint8_t)USART0->RXDAT;
+		Uart0.PushRx(b);
+		Int = USART0->STAT;                 // re-leer para el siguiente ciclo
 	}
 
 	if(Int & (1 << 2)) // termino de escribir un byte

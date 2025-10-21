@@ -25,5 +25,7 @@ extern UART0 Uart0;
 void delay();
 
 void log_debug(uint8_t* text, int length);
+bool STR_Comparar(const uint8_t* s1, const uint8_t* s2);
+
 
 #endif /* UTILS_GRAL_GRAL_H_ */

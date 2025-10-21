@@ -1,4 +1,4 @@
-../src/drivers/UART_Driver/UART0.cpp:22:6:void UART0_IRQHandler()	16	static
+../src/drivers/UART_Driver/UART0.cpp:22:6:void UART0_IRQHandler()	24	static
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/UART_Driver/UART0.h:25:2:STRUCT_RX0::STRUCT_RX0()	16	static
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/UART_Driver/UART0.h:32:2:STRUCT_TX0::STRUCT_TX0()	16	static
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/UART_Driver/UART0.h:38:2:UART0_Struct::UART0_Struct()	16	static

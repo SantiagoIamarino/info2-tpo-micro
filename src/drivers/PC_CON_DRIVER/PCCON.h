@@ -37,6 +37,7 @@ public:
 	bool Leer_Resp(uint8_t* resp_a_buscar, bool debug);
 	bool Leer_Resp_Con_Reintentos(uint8_t* resp_a_buscar, uint32_t max_intentos, bool debug);
 	void Enviar_Comando(uint8_t* cmd);
+	bool Obtener_Respuesta(uint8_t** buf, uint8_t resp_length);
 
 	bool cfg_obtenida = false;
 	bool ack_recibido = false;

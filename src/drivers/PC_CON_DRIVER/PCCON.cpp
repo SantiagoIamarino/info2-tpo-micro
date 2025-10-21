@@ -31,12 +31,11 @@ bool PC_CON::Leer_Resp(uint8_t* resp_a_buscar, bool debug = false) {
 		}
 
 		if(debug) {
-			Uart0.PushTx((uint8_t)'?');
-			if((uint8_t)byte != (uint8_t)'<'){
+			/*if((uint8_t)byte != (uint8_t)'<'){
 				Uart0.PushTx((uint8_t)byte);
 			} else {
 				Uart0.PushTx((uint8_t)'$');
-			}
+			}*/
 		}
 
 		if(byte == resp_a_buscar[resp_index]){ // comparo byte a byte
@@ -83,6 +82,29 @@ void PC_CON::Enviar_Comando(uint8_t* cmd) {
 	Uart0.Send((uint8_t*)cmd, 0);
 }
 
+bool PC_CON::Obtener_Respuesta(uint8_t** buf, uint8_t resp_length){
+	uint8_t i = 0;
+	uint8_t attempts = 0;
+	bool se_obtuvo_resp = false;
+
+	while(attempts < MAX_NO_RESP_COUNTER) {
+		attempts++;
+
+		int32_t byte = Uart0.PopRx();
+		if(byte < 0) continue;
+
+		(*buf)[i] = (uint8_t)byte;
+		i++;
+
+		if(i == resp_length) {
+			se_obtuvo_resp = true;
+			break;
+		}
+	}
+
+	return se_obtuvo_resp;
+}
+
 bool PC_CON::Obtener_Configuracion(SuenioCFG* cfg){
 
 	if(!this->initiated) {
@@ -91,15 +113,71 @@ bool PC_CON::Obtener_Configuracion(SuenioCFG* cfg){
 
 	this->Enviar_Comando((uint8_t*)"<REQ_CONFIG>");
 
-	if(!Leer_Resp_Con_Reintentos((uint8_t*)"<ACK_REQ_CONFIG>")){
+	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)"<ACK_REQ_CONFIG>")){
 		return false;
 	}
 
-	if(!Leer_Resp_Con_Reintentos((uint8_t*)"<CFG:HORAS_SUENIO=", 3, true)){
+	// ejemplo <CFG:HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
+
+	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)"<CFG:HORAS_SUENIO=")){
 		return false;
 	}
 
-	Uart0.PushTx((uint8_t)'!');
+	uint8_t* buf;
+	if(!this->Obtener_Respuesta(&buf, 2)) {
+		return false;
+	}
+
+	uint8_t ascii_decenas = buf[0] - '0';
+	uint8_t ascii_unidades = buf[1] - '0';
+	uint8_t horas_suenio = ascii_decenas * 10 + ascii_unidades;
+
+	if(horas_suenio < 0 || horas_suenio > 20){
+		return false;
+	}
+
+	cfg->horas_suenio = horas_suenio;
+
+	// ejemplo <CFG:HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
+	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)";ALARMA_ON=")){
+		return false;
+	}
+
+	if(!this->Obtener_Respuesta(&buf, 5)) {
+		return false;
+	}
+
+	buf[5] = '\0';
+	if(STR_Comparar((uint8_t*)buf, (uint8_t*)"0TRUE")) {
+		cfg->alarma_on = true;
+	} else if(STR_Comparar((uint8_t*)buf, (uint8_t*)"FALSE")) {
+		cfg->alarma_on = false;
+	} else { // error al obtener la resp
+		return false;
+	}
+
+	// ejemplo <CFG:HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
+	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)";LUZ_ON=")){
+		return false;
+	}
+
+	if(!this->Obtener_Respuesta(&buf, 5)) {
+		return false;
+	}
+
+	buf[5] = '\0';
+	if(STR_Comparar((uint8_t*)buf, (uint8_t*)"0TRUE")) {
+		cfg->luz_on = true;
+	} else if(STR_Comparar((uint8_t*)buf, (uint8_t*)"FALSE")) {
+		cfg->luz_on = false;
+	} else { // error al obtener la resp
+		return false;
+	}
+
+	// busco fin de MSG
+	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)">")){
+		return false;
+	}
 
 	return true;
 
