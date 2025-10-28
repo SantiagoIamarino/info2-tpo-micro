@@ -20,6 +20,7 @@
 #include "GRAL.h"
 
 struct SuenioCFG {
+	uint8_t profile_id;
     uint8_t horas_suenio;
     bool alarma_on;
     bool luz_on;

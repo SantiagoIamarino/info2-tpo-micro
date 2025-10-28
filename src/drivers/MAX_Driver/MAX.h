@@ -41,9 +41,13 @@ public:
 	bool init(void);
 	bool read(uint32_t* red, uint32_t* ir);
 	static void tick_read();
+	void pause()  { paused = true; }
+	void resume() { paused = false; }
+	uint16_t Get_PPM(void) { return pulso_ppm_actual; };
 	virtual ~MAX();
 private:
 	bool initiated;
+	bool paused = false;
 	bool filtro_initiated;
 	int32_t filtro_dc;
 	int32_t filtro_valor;

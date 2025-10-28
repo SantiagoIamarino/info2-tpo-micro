@@ -5,7 +5,7 @@
 ../src/drivers/PC_CON_DRIVER/PCCON.cpp:81:6:void PC_CON::Enviar_Comando(uint8_t*)	16	static
 ../src/drivers/PC_CON_DRIVER/PCCON.cpp:85:6:bool PC_CON::Obtener_Respuesta(uint8_t**, uint8_t)	32	static
 ../src/drivers/PC_CON_DRIVER/PCCON.cpp:108:6:bool PC_CON::Obtener_Configuracion(SuenioCFG*)	32	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:186:1:PC_CON::~PC_CON()	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:186:1:virtual PC_CON::~PC_CON()	16	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:188:1:void __static_initialization_and_destruction_0()	8	static
-../src/drivers/PC_CON_DRIVER/PCCON.cpp:188:1:cpp)	8	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:204:1:PC_CON::~PC_CON()	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:204:1:virtual PC_CON::~PC_CON()	16	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:206:1:void __static_initialization_and_destruction_0()	8	static
+../src/drivers/PC_CON_DRIVER/PCCON.cpp:206:1:cpp)	8	static

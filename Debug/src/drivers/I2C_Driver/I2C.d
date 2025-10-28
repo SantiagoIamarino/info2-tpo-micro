@@ -16,6 +16,7 @@ src/drivers/I2C_Driver/I2C.o src/drivers/I2C_Driver/I2C.d: \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MAX_Driver/MAX.h \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MPU_Driver/MPU.h \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h \
+ /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/PC_CON_DRIVER/PCCON.h
 ../src/drivers/I2C_Driver/I2C.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/inc/tipos.h:
@@ -33,5 +34,6 @@ src/drivers/I2C_Driver/I2C.o src/drivers/I2C_Driver/I2C.d: \
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/GRAL/GRAL.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MAX_Driver/MAX.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MPU_Driver/MPU.h:
+/Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/PC_CON_DRIVER/PCCON.h:

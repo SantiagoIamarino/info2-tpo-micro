@@ -17,6 +17,7 @@ src/drivers/TIMERS_Driver/TIMER.o src/drivers/TIMERS_Driver/TIMER.d: \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MAX_Driver/MAX.h \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MPU_Driver/MPU.h \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h \
+ /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h \
  /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/PC_CON_DRIVER/PCCON.h
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/inc/Defines.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/inc/tipos.h:
@@ -34,5 +35,6 @@ src/drivers/TIMERS_Driver/TIMER.o src/drivers/TIMERS_Driver/TIMER.d: \
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/inc/Hardware.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MAX_Driver/MAX.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/MPU_Driver/MPU.h:
+/Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/SUENIO_MAQ_ESTADOS/suenio.h:
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/drivers/PC_CON_DRIVER/PCCON.h:

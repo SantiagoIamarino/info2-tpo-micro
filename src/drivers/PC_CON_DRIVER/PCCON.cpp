@@ -117,9 +117,9 @@ bool PC_CON::Obtener_Configuracion(SuenioCFG* cfg){
 		return false;
 	}
 
-	// ejemplo <CFG:HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
+	// ejemplo <CFG:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
 
-	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)"<CFG:HORAS_SUENIO=")){
+	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)"<CFG:PF_ID=")){
 		return false;
 	}
 
@@ -130,6 +130,24 @@ bool PC_CON::Obtener_Configuracion(SuenioCFG* cfg){
 
 	uint8_t ascii_decenas = buf[0] - '0';
 	uint8_t ascii_unidades = buf[1] - '0';
+	uint8_t profile_id = ascii_decenas * 10 + ascii_unidades;
+
+	if(profile_id < 0){
+		return false;
+	}
+
+	cfg->profile_id = profile_id;
+
+	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)";HORAS_SUENIO=")){
+		return false;
+	}
+
+	if(!this->Obtener_Respuesta(&buf, 2)) {
+		return false;
+	}
+
+	ascii_decenas = buf[0] - '0';
+	ascii_unidades = buf[1] - '0';
 	uint8_t horas_suenio = ascii_decenas * 10 + ascii_unidades;
 
 	if(horas_suenio < 0 || horas_suenio > 20){

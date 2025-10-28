@@ -153,7 +153,7 @@ int32_t MAX::pulso_filtro(int32_t ir_val){
 
 
 void MAX::tick_read(void) {
-	if (!s_self) return;
+	if (!s_self || s_self->paused) return;
 
 	uint32_t red, ir;
 	if (!s_self->read(&red, &ir)) {

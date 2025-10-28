@@ -22,6 +22,10 @@
 #define REG_WHO_AM_I 		0x75
 #define REG_ACCEL_XOUT_H 	0x3B
 
+#define ACC_ESTADO_QUIETO 0
+#define ACC_ESTADO_MICRO 1
+#define ACC_ESTADO_MOVIMIENTO 2
+
 class MPU {
 public:
 	MPU();
@@ -29,14 +33,18 @@ public:
 	bool init();
 	void read();
 	static void tick_read();
+	void pause()  { paused = true; }
+	void resume() { paused = false; }
 	void procesarMuestra(int16_t ax, int16_t ay, int16_t az);
 	char* i16toa(int16_t v, char* p);
 	void log_acc(int16_t ax, int16_t ay, int16_t az);
+	uint8_t Get_Estado_Movimiento(void){ return estado_movimiento; };
 
 	uint8_t posible_caida_counter = 0;
 	bool caida_detectada = false;
 
 	bool initiated;
+	bool paused = false;
 	static MPU* s_self;
 	virtual ~MPU();
 
@@ -46,7 +54,7 @@ private:
 	uint32_t sum_abs = 0;   // Σ |ax_ac|+|ay_ac|+|az_ac|
 	uint16_t n = 0;
 
-	// Score expuesto (promedio por muestra en la última ventana)
+	// Score expuesto (promedio por muestra en la ultima ventana)
 	uint32_t valor_acc_actual = 0;
 
 	uint8_t  estado_movimiento = 0;

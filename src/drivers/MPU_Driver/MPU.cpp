@@ -12,10 +12,6 @@ TIMER* tick_MPU;
 MPU* MPU::s_self = nullptr;
 
 #define FREC_TICK_READ 50
-#define ACC_ESTADO_QUIETO 0
-#define ACC_ESTADO_MICRO 1
-#define ACC_ESTADO_MOVIMIENTO 2
-
 
 // cada cuando analizo muestras
 static const uint16_t WIN_MS = 100;
@@ -80,7 +76,7 @@ bool MPU::init()
 }
 
 void MPU::tick_read(void) {
-	if (!s_self) return;
+	if (!s_self || s_self->paused) return;
 
 	s_self->read();
 }
