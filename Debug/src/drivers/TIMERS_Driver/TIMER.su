@@ -1,5 +1,5 @@
 ../src/drivers/TIMERS_Driver/TIMER.cpp:10:1:TIMER::TIMER(uint32_t, uint32_t, void (*)())	24	static
-../src/drivers/TIMERS_Driver/TIMER.cpp:14:6:void TIMER::Start(uint32_t, uint32_t, void (*)())	24	static
-../src/drivers/TIMERS_Driver/TIMER.cpp:20:6:void TIMER::Stop()	16	static
-../src/drivers/TIMERS_Driver/TIMER.cpp:25:6:void TIMER::Discount()	16	static
-../src/drivers/TIMERS_Driver/TIMER.cpp:36:6:virtual void TIMER::Callback()	16	static
+../src/drivers/TIMERS_Driver/TIMER.cpp:14:6:void TIMER::Start(uint32_t, uint32_t, void (*)())	0	static
+../src/drivers/TIMERS_Driver/TIMER.cpp:20:6:void TIMER::Stop()	0	static
+../src/drivers/TIMERS_Driver/TIMER.cpp:25:6:void TIMER::Discount()	8	static
+../src/drivers/TIMERS_Driver/TIMER.cpp:36:6:virtual void TIMER::Callback()	8	static

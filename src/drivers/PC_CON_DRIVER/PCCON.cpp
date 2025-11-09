@@ -6,9 +6,13 @@
  */
 
 #include "PCCON.h"
+#include "cfg_maq_estados.h"
 
 #define INIT_MAX_ATTEMPTS 10
 #define MAX_NO_RESP_COUNTER 99999999
+
+extern bool cfg_msg_done;
+extern bool cfg_msg_error;
 
 UART0	Uart0(9600);
 
@@ -117,87 +121,21 @@ bool PC_CON::Obtener_Configuracion(SuenioCFG* cfg){
 		return false;
 	}
 
-	// ejemplo <CFG:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
+	uint32_t timeout = MAX_NO_RESP_COUNTER;
+	while (timeout--) {
+		cfg_maq_estados(cfg);
 
-	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)"<CFG:PF_ID=")){
-		return false;
+		if (cfg_msg_done) {
+			return true;
+		}
+
+		if (cfg_msg_error) {
+			return false;
+		}
 	}
 
-	uint8_t* buf;
-	if(!this->Obtener_Respuesta(&buf, 2)) {
-		return false;
-	}
-
-	uint8_t ascii_decenas = buf[0] - '0';
-	uint8_t ascii_unidades = buf[1] - '0';
-	uint8_t profile_id = ascii_decenas * 10 + ascii_unidades;
-
-	if(profile_id < 0){
-		return false;
-	}
-
-	cfg->profile_id = profile_id;
-
-	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)";HORAS_SUENIO=")){
-		return false;
-	}
-
-	if(!this->Obtener_Respuesta(&buf, 2)) {
-		return false;
-	}
-
-	ascii_decenas = buf[0] - '0';
-	ascii_unidades = buf[1] - '0';
-	uint8_t horas_suenio = ascii_decenas * 10 + ascii_unidades;
-
-	if(horas_suenio < 0 || horas_suenio > 20){
-		return false;
-	}
-
-	cfg->horas_suenio = horas_suenio;
-
-	// ejemplo <CFG:HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
-	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)";ALARMA_ON=")){
-		return false;
-	}
-
-	if(!this->Obtener_Respuesta(&buf, 5)) {
-		return false;
-	}
-
-	buf[5] = '\0';
-	if(STR_Comparar((uint8_t*)buf, (uint8_t*)"0TRUE")) {
-		cfg->alarma_on = true;
-	} else if(STR_Comparar((uint8_t*)buf, (uint8_t*)"FALSE")) {
-		cfg->alarma_on = false;
-	} else { // error al obtener la resp
-		return false;
-	}
-
-	// ejemplo <CFG:HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=TRUE>
-	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)";LUZ_ON=")){
-		return false;
-	}
-
-	if(!this->Obtener_Respuesta(&buf, 5)) {
-		return false;
-	}
-
-	buf[5] = '\0';
-	if(STR_Comparar((uint8_t*)buf, (uint8_t*)"0TRUE")) {
-		cfg->luz_on = true;
-	} else if(STR_Comparar((uint8_t*)buf, (uint8_t*)"FALSE")) {
-		cfg->luz_on = false;
-	} else { // error al obtener la resp
-		return false;
-	}
-
-	// busco fin de MSG
-	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)">")){
-		return false;
-	}
-
-	return true;
+	// timeout sin recibir config
+	return false;
 
 }
 

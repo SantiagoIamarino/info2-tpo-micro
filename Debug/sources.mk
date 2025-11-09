@@ -32,6 +32,7 @@ OBJS :=
 SUBDIRS := \
 src \
 src/UTILS/CALLBACK \
+src/UTILS/CFG_MAQ_ESTADOS \
 src/UTILS/GRAL \
 src/UTILS/SUENIO_MAQ_ESTADOS \
 src/drivers/GPIO_Driver \

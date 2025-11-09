@@ -12,6 +12,10 @@ TIMER* tick_MPU;
 MPU* MPU::s_self = nullptr;
 
 #define FREC_TICK_READ 50
+#define ACC_ESTADO_QUIETO 0
+#define ACC_ESTADO_MICRO 1
+#define ACC_ESTADO_MOVIMIENTO 2
+
 
 // cada cuando analizo muestras
 static const uint16_t WIN_MS = 100;
@@ -58,7 +62,7 @@ bool MPU::init()
 			continue;
 		}
 
-		if (who == MPU_ADDR) {
+		if (who == 0x70) {
 			I2C_ACC.writeReg(MPU_ADDR, REG_PWR_MGMT_1, 0x00);
 			log_debug((uint8_t*)"Init MPU OK\r\n", 0);
 			this->initiated = true;
@@ -68,6 +72,9 @@ bool MPU::init()
 		}
 
 		log_debug((uint8_t*)"Init MPU FAIL\r\n", 0);
+		char msg[32];
+		sprintf(msg, "WHO=0x%02X\r\n", who);
+		log_debug((uint8_t*)msg, 0);
 	}
 
 	log_debug((uint8_t*)"Init MPU FAIL\r\n", 0);

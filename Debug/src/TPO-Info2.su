@@ -1,6 +1,2 @@
-../src/TPO-Info2.cpp:12:13:void uart_print_str(const char*)	16	static
-../src/TPO-Info2.cpp:16:13:void uart_print_u8_2(uint8_t)	16	static
-../src/TPO-Info2.cpp:22:13:void Log_SuenioCFG(const SuenioCFG*)	16	static
-../src/TPO-Info2.cpp:34:5:int main()	8	static
-../src/TPO-Info2.cpp:54:1:void __static_initialization_and_destruction_0()	8	static
-../src/TPO-Info2.cpp:54:1:cpp)	8	static
+../src/TPO-Info2.cpp:9:5:int main()	16	static
+../src/TPO-Info2.cpp:27:1:cpp)	16	static

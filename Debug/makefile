@@ -18,6 +18,7 @@ RM := rm -rf
 -include src/drivers/GPIO_Driver/subdir.mk
 -include src/UTILS/SUENIO_MAQ_ESTADOS/subdir.mk
 -include src/UTILS/GRAL/subdir.mk
+-include src/UTILS/CFG_MAQ_ESTADOS/subdir.mk
 -include src/UTILS/CALLBACK/subdir.mk
 -include src/subdir.mk
 ifneq ($(MAKECMDGOALS),clean)

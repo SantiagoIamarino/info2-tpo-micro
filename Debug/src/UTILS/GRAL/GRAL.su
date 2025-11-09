@@ -1,3 +1,3 @@
-../src/UTILS/GRAL/GRAL.cpp:10:6:void delay()	16	static
-../src/UTILS/GRAL/GRAL.cpp:14:6:void log_debug(uint8_t*, int)	16	static
-../src/UTILS/GRAL/GRAL.cpp:18:6:bool STR_Comparar(const uint8_t*, const uint8_t*)	16	static
+../src/UTILS/GRAL/GRAL.cpp:10:6:void delay()	8	static
+../src/UTILS/GRAL/GRAL.cpp:14:6:void log_debug(uint8_t*, int)	8	static
+../src/UTILS/GRAL/GRAL.cpp:18:6:bool STR_Comparar(const uint8_t*, const uint8_t*)	8	static
