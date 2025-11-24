@@ -1,0 +1,6 @@
+../src/UTILS/ACTUADORES/actuadores.cpp:30:6:void luz_actuador()	16	static
+../src/UTILS/ACTUADORES/actuadores.cpp:44:6:void alarma_actuador()	16	static
+../src/UTILS/ACTUADORES/actuadores.cpp:109:6:void tick_actuadores()	8	static
+../src/UTILS/ACTUADORES/actuadores.cpp:83:6:void activarActuadores(bool)	0	static
+../src/UTILS/ACTUADORES/actuadores.cpp:92:6:void pararActuadores()	8	static
+../src/UTILS/ACTUADORES/actuadores.cpp:119:1:cpp)	8	static

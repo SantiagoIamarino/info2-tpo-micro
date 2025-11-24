@@ -17,12 +17,9 @@ void TIMER::Start(uint32_t timeStart, uint32_t timeReload, void (*func)(void)){
 	this->func = func;
 }
 
-void TIMER::Stop(void)
-{
-	this->time = 0;
-}
-
 void TIMER::Discount(void){
+	if(this->stopped) return;
+
 	if(this->time > 0){
 		this->time--;
 		if(0 == this->time){

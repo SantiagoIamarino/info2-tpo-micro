@@ -1,12 +1,12 @@
-../src/drivers/MAX_Driver/MAX.cpp:321:1:MAX::~MAX()	0	static
-../src/drivers/MAX_Driver/MAX.cpp:321:1:virtual MAX::~MAX()	8	static
-../src/drivers/MAX_Driver/MAX.cpp:40:6:void MAX::reset_vars()	0	static
-../src/drivers/MAX_Driver/MAX.cpp:35:1:MAX::MAX()	8	static
-../src/drivers/MAX_Driver/MAX.cpp:51:6:bool MAX::probe()	56	static
-../src/drivers/MAX_Driver/MAX.cpp:71:6:bool MAX::init()	40	static
-../src/drivers/MAX_Driver/MAX.cpp:131:9:int32_t MAX::pulso_filtro(int32_t)	0	static
-../src/drivers/MAX_Driver/MAX.cpp:164:6:void MAX::buscar_picos(uint32_t*)	16	static
-../src/drivers/MAX_Driver/MAX.cpp:226:6:void MAX::pulso_maq_estados(uint32_t*)	80	static
-../src/drivers/MAX_Driver/MAX.cpp:281:6:bool MAX::read(uint32_t*, uint32_t*)	56	static
-../src/drivers/MAX_Driver/MAX.cpp:155:6:static void MAX::tick_read()	16	static
-../src/drivers/MAX_Driver/MAX.cpp:323:1:cpp)	8	static
+../src/drivers/MAX_Driver/MAX.cpp:331:1:MAX::~MAX()	0	static
+../src/drivers/MAX_Driver/MAX.cpp:331:1:virtual MAX::~MAX()	8	static
+../src/drivers/MAX_Driver/MAX.cpp:41:6:void MAX::reset_vars()	0	static
+../src/drivers/MAX_Driver/MAX.cpp:36:1:MAX::MAX()	8	static
+../src/drivers/MAX_Driver/MAX.cpp:52:6:bool MAX::probe()	56	static
+../src/drivers/MAX_Driver/MAX.cpp:72:6:bool MAX::init()	40	static
+../src/drivers/MAX_Driver/MAX.cpp:132:9:int32_t MAX::pulso_filtro(int32_t)	0	static
+../src/drivers/MAX_Driver/MAX.cpp:165:6:void MAX::buscar_picos(uint32_t*)	16	static
+../src/drivers/MAX_Driver/MAX.cpp:227:6:void MAX::pulso_maq_estados(uint32_t*)	88	static
+../src/drivers/MAX_Driver/MAX.cpp:290:6:bool MAX::read(uint32_t*, uint32_t*)	56	static
+../src/drivers/MAX_Driver/MAX.cpp:156:6:static void MAX::tick_read()	16	static
+../src/drivers/MAX_Driver/MAX.cpp:333:1:cpp)	8	static

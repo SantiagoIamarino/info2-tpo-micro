@@ -11,6 +11,7 @@
 #include <cstdio>
 #include "tipos.h"
 #include "GPIO.h"
+#include "GPIOF.h"
 #include "UART0.h"
 #include "I2C.h"
 #include "GRAL.h"
@@ -23,8 +24,11 @@
 #include "MPU.h"
 #include "suenio.h"
 #include "PCCON.h"
+#include "actuadores.h"
 
 void suenio_maq_estados(SuenioCFG* suenio_config);
 void suenio_tick(void);
+void despertar_tick(void);
+void reset_maq_estados(void);
 
 #endif /* UTILS_SUENIO_MAQ_ESTADOS_SUENIO_H_ */

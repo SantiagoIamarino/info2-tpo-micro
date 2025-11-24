@@ -39,6 +39,8 @@ public:
 	char* i16toa(int16_t v, char* p);
 	void log_acc(int16_t ax, int16_t ay, int16_t az);
 	uint8_t Get_Estado_Movimiento(void){ return estado_movimiento; };
+	uint8_t Get_Posible_Caida(void){ return caida_detectada; };
+	void Reset_Posible_Caida(void){ caida_detectada = false; };
 
 	uint8_t posible_caida_counter = 0;
 	bool caida_detectada = false;

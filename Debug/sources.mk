@@ -31,10 +31,14 @@ OBJS :=
 # Every subdirectory with source files must be described here
 SUBDIRS := \
 src \
+src/UTILS/ACTUADORES \
+src/UTILS/CAIDAS \
 src/UTILS/CALLBACK \
 src/UTILS/CFG_MAQ_ESTADOS \
 src/UTILS/GRAL \
 src/UTILS/SUENIO_MAQ_ESTADOS \
+src/drivers/GPIOF_Driver \
+src/drivers/GPIOPWM_Driver \
 src/drivers/GPIO_Driver \
 src/drivers/I2C_Driver \
 src/drivers/MAX_Driver \

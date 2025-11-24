@@ -5,7 +5,10 @@
 #include <cstdio>
 #include "tipos.h"
 #include "LPC845.h"
+#include "Hardware.h"
 #include "GPIO.h"
+#include "GPIOF.h"
+#include "GPIOPWM.h"
 #include "SYSTICK.h"
 #include "CALLBACK.h"
 #include "TIMER.h"
@@ -16,7 +19,6 @@
 #include "MPU.h"
 #include "suenio.h"
 #include "PCCON.h"
-#include "cfg_maq_estados.h"
 
 #ifndef __NOP
   #ifdef __GNUC__

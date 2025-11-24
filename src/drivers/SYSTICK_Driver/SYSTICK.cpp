@@ -7,7 +7,7 @@
 
 #include "Defines.h"
 
-SYSTICK Systick(1000);
+SYSTICK Systick(10000);
 
 SYSTICK::SYSTICK(uint32_t frec){
 

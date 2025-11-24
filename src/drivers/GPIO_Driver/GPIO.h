@@ -5,6 +5,8 @@
  *      Author: gusta
  */
 
+#include "tipos.h"
+
 #ifndef GPIO_DRIVER_GPIO_H_
 #define GPIO_DRIVER_GPIO_H_
 

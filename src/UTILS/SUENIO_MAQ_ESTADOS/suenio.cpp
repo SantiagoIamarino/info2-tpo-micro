@@ -6,6 +6,7 @@
 #define LIMITE_PULSO_DORMIDO 		100 // pulsaciones por minuto
 #define SIN_MOVIMIENTO_SEG 			10 // en segundos
 #define PULSO_DEBAJO_LIMITE_SEG		10 // en segundos
+#define TIEMPO_DESPERTAR_HARDCODE   10 // 0 para no hardcodear
 
 #define ESTADO_DESPIERTO 0
 #define ESTADO_DORMIDO 1
@@ -19,6 +20,8 @@ extern MAX MAX_SENSOR;
 extern MPU MPU_ACC;
 extern PC_CON PC_CONNECTION;
 extern UART0 Uart0;
+extern GPIOF Pulsador;
+extern PC_CON PC_CONNECTION;
 
 uint8_t tiempo_sin_movimiento = 0;
 uint8_t tiempo_pulso_bajo = 0;
@@ -28,6 +31,15 @@ int32_t tiempo_hasta_despertar = -1;
 uint8_t log_counter = 0;
 
 SuenioCFG* suenio_cfg = nullptr;
+
+void reset_maq_estados(void){
+	tiempo_sin_movimiento = 0;
+	tiempo_pulso_bajo = 0;
+	sumatoria_ppm = 0;
+
+	tiempo_hasta_despertar = -1;
+	log_counter = 0;
+}
 
 void suenio_maq_estados(SuenioCFG* suenio_config) {
 	if(!suenio_tick_timer) {
@@ -52,20 +64,35 @@ void suenio_maq_estados(SuenioCFG* suenio_config) {
 			// Envia informacion fisiologica LPC->ESP_32->PC
 			if(tiempo_hasta_despertar == -1) { // primera vez que entra, seteo el tiempo que falta hasta despertar (en segundos)
 				tiempo_hasta_despertar = (int32_t)suenio_config->horas_suenio * (int32_t)(60 * 60) ;
+				if(TIEMPO_DESPERTAR_HARDCODE > 0){ // en el caso que necesite hardcodear el tiempo hasta despertar (pruebas/debug)
+					tiempo_hasta_despertar = TIEMPO_DESPERTAR_HARDCODE;
+				}
 			}
 			break;
 		case ESTADO_HORA_DE_DESPERTAR:
-			// activo actuators progresivamente ACTUADORES_MAQUINA_ESTADO
-			// QUEDO PENDIENTE A NOTIFICACION DESDE LA PC (EL USUARIO YA DESPERTO) o movimiento (podria agregarse un pulsador)
+			// activo actuadores progresivamente
+			activarActuadores(true);
+
+			// QUEDO PENDIENTE A el pulsador (el usuario ya despertó)
+			if(Pulsador.Get() == ESTADO_PULSADOR_ON){
+				// PARAR ACTUADORES
+				pararActuadores();
+
+				// volver a el estado inicial
+				estado_suenio = ESTADO_DESPIERTO;
+				reset_maq_estados();
+			}
 			break;
 		default:
 			break;
 	}
-}
 
-static void uart_send_2d(uint8_t n) {
-    Uart0.PushTx((uint8_t)('0' + (n / 10)));
-    Uart0.PushTx((uint8_t)('0' + (n % 10)));
+	if(estado_suenio != ESTADO_DESPIERTO && MPU_ACC.Get_Posible_Caida() && PC_CONNECTION.Ready()) {
+		// caida detectada, notificar pc y activar actuadores
+		activarActuadores(false);
+		MPU_ACC.Reset_Posible_Caida();
+		PC_CONNECTION.NotificarPosibleCaida();
+	}
 }
 
 void enviar_info_fisiologica(uint32_t tiempo_seg) {
@@ -79,11 +106,28 @@ void enviar_info_fisiologica(uint32_t tiempo_seg) {
 
 	MPU_ACC.pause(); MAX_SENSOR.pause(); // pausar sensores brevemente para evitar pedida de bytes en uart
 
-    Uart0.Send((uint8_t*)"<INFO_FISIO:PF_ID=", 0);
-    uart_send_2d(suenio_cfg->profile_id);
-    Uart0.Send((uint8_t*)";PPM=", 0);
-    uart_send_2d(promedio_ppm);
-    Uart0.Send((uint8_t*)">\r\n", 0);
+	char buf[64];
+	int n = snprintf(buf, sizeof(buf), "<INFO_FISIO:PF_ID=%02d;PPM=%02d",
+					 suenio_cfg->profile_id, promedio_ppm);
+
+	// checksum
+	uint8_t checksum = 0;
+	// Sumar todos los bytes entre '<>' (no tomo primer valor buf[0])
+	for (int i = 1; i < n; i++) {
+		checksum += (uint8_t)buf[i];
+	}
+
+	// agrego ";CS=NN>" a la trama
+	int m = snprintf(buf + n, sizeof(buf) - n, ";CS=%02X>\r\n", checksum);
+	if (m <= 0 || (n + m) >= (int)sizeof(buf)) {
+		// en casi de error
+		MPU_ACC.resume();
+		MAX_SENSOR.resume();
+		sumatoria_ppm = 0;
+		return;
+	}
+
+    Uart0.Send((uint8_t*)buf, 0);
 
     MPU_ACC.resume(); MAX_SENSOR.resume(); // reanudo sensores
     sumatoria_ppm = 0;
@@ -111,21 +155,21 @@ void suenio_tick(void) {
 			return;
 		}
 
-		if(sumatoria_ppm > 0) {
-			sumatoria_ppm += MAX_SENSOR.Get_PPM();
-		} else {
-			sumatoria_ppm = MAX_SENSOR.Get_PPM();
+		if(MAX_SENSOR.Get_PPM() > PPM_MIN_VALID && MAX_SENSOR.Get_PPM() < PPM_MAX_VALID) {
+			if(sumatoria_ppm > 0) {
+				sumatoria_ppm += MAX_SENSOR.Get_PPM();
+			} else {
+				sumatoria_ppm = MAX_SENSOR.Get_PPM();
+			}
+
+			tiempo_hasta_despertar--;
+
+			if(++log_counter >= INFO_FISIOLOGICA_CADA) {
+				enviar_info_fisiologica(tiempo_hasta_despertar);
+				log_counter = 0;
+			}
 		}
-
-		tiempo_hasta_despertar--;
-
-		if(++log_counter >= INFO_FISIOLOGICA_CADA) {
-			enviar_info_fisiologica(tiempo_hasta_despertar);
-			log_counter = 0;
-		}
-
 	}
 }
-
 
 

@@ -16,10 +16,14 @@ RM := rm -rf
 -include src/drivers/MAX_Driver/subdir.mk
 -include src/drivers/I2C_Driver/subdir.mk
 -include src/drivers/GPIO_Driver/subdir.mk
+-include src/drivers/GPIOPWM_Driver/subdir.mk
+-include src/drivers/GPIOF_Driver/subdir.mk
 -include src/UTILS/SUENIO_MAQ_ESTADOS/subdir.mk
 -include src/UTILS/GRAL/subdir.mk
 -include src/UTILS/CFG_MAQ_ESTADOS/subdir.mk
 -include src/UTILS/CALLBACK/subdir.mk
+-include src/UTILS/CAIDAS/subdir.mk
+-include src/UTILS/ACTUADORES/subdir.mk
 -include src/subdir.mk
 ifneq ($(MAKECMDGOALS),clean)
 ifneq ($(strip $(C++M_DEPS)),)

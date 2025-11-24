@@ -24,7 +24,7 @@ static const uint16_t WIN_N = WIN_MS / FREC_TICK_READ;
 
 static const uint32_t SCORE_QUIETO = 1000;
 static const uint32_t SCORE_ACTIVO = 8000;
-static const uint32_t SCORE_POSIBLE_CAIDA = 30000;
+static const uint32_t SCORE_POSIBLE_CAIDA = 5000;
 static const uint32_t MIN_POSIBLE_CAIDA_MUESTRAS = 3;
 
 MPU::MPU() {
@@ -147,8 +147,9 @@ void MPU::procesarMuestra(int16_t ax, int16_t ay, int16_t az) {
 
         // detecto posible caida
         if(this->valor_acc_actual >= SCORE_POSIBLE_CAIDA) {
-        	if(this->posible_caida_counter++ == MIN_POSIBLE_CAIDA_MUESTRAS) {
+        	if(this->posible_caida_counter++ >= MIN_POSIBLE_CAIDA_MUESTRAS && !this->caida_detectada) {
         		this->caida_detectada = true;
+        		this->posible_caida_counter = 0;
         	}
         } else {
         	this->posible_caida_counter = 0;

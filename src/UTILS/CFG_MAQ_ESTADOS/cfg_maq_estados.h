@@ -25,7 +25,7 @@
 #include "PCCON.h"
 
 
-void cfg_maq_estados(SuenioCFG* suenio_config, bool es_update = false);
+void cfg_maq_estados(int32_t b, SuenioCFG* suenio_config, bool es_update = false);
 
 
 

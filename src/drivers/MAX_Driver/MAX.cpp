@@ -30,6 +30,7 @@ static constexpr uint32_t RR_MAX_MS       = 1500; // 40 bpm
 static constexpr uint16_t MIN_AMP         = 200;  // amplitud minima picos (en unidades del filtrado)
 static constexpr uint16_t MIN_THR         = 80;   // piso del umbral dinámico
 
+
 #define MUESTRAS_ESTABILIZACION_UMBRAL (MUESTRAS_ESTABILIZACION_UMBRAL_MS / FREC_MUESTREO_EN_MS)
 
 MAX::MAX() {
@@ -252,6 +253,14 @@ void MAX::pulso_maq_estados(uint32_t* ir) {
 			int32_t dif_ultimo_ppm = (int32_t)ppm_inst - (int32_t)s_self->pulso_ppm_actual;
 			dif_ultimo_ppm = (dif_ultimo_ppm < 0) ? (-dif_ultimo_ppm) : dif_ultimo_ppm; // valor absoluto
 
+			if (ppm_inst < PPM_MIN_VALID || ppm_inst > PPM_MAX_VALID) {
+			    s_self->pulso_sube_cnt = 0;
+			    s_self->pulso_baja_cnt = 0;
+			    s_self->pulso_t_desde_ult_pico = 0;
+			    s_self->pulso_subio = false;
+			    break;
+			}
+
 			if(s_self->pulso_ppm_actual == 0) { // 1era muestra de pulso
 				s_self->pulso_ppm_actual = ppm_inst;
 			} else if(dif_ultimo_ppm > (s_self->pulso_ppm_actual / 4)) { // si la diferencia entre mediciones es mas del 25% -> DESCARTAR
@@ -286,7 +295,7 @@ bool MAX::read(uint32_t* red, uint32_t* ir) {
 	uint8_t avail = (wr - rd) & 0x1F;
 	if (avail == 0) return false;
 
-	// 2) limitar burst para no bloquear mucho
+	// 2) limitar para no bloquear mucho
 	uint8_t n = (avail > MAX_LECTURAS_POR_TICK) ? MAX_LECTURAS_POR_TICK : avail;
 
 	// 3) leer n muestras
@@ -302,6 +311,7 @@ bool MAX::read(uint32_t* red, uint32_t* ir) {
 				s_self->pulso_state_reset_counter++;
 				if(s_self->pulso_state_reset_counter == 5) { // avanza a partir de las 5 muestras con datos
 					s_self->pulso_state = PULSO_SIN_CONTACTO;
+					pulso_state_reset_counter = 0;
 				}
 				continue;
 			}

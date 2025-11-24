@@ -27,5 +27,8 @@ void delay();
 void log_debug(uint8_t* text, int length);
 bool STR_Comparar(const uint8_t* s1, const uint8_t* s2);
 
+int8_t hex_digit_to_val(uint8_t c);
+uint8_t hex_a_dec(const uint8_t* buf2);
+
 
 #endif /* UTILS_GRAL_GRAL_H_ */

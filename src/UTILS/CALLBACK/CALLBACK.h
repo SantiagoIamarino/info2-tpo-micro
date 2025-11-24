@@ -11,12 +11,14 @@
 class CALLBACK {
 
 public:
-	CALLBACK();
+	CALLBACK(bool fast = false);
 
 	/*Este método debe ser implementado por las clases
 	derivadas cada una resolverá que hacer con su Irq
 	enganchada al  systick del sistema	*/
 	virtual void Callback( void );
+
+	virtual void FastCallBack(void);
 
 	static void SysTickCall(void);
 };

@@ -30,9 +30,6 @@ void I2C::ioconDigital(uint8_t pin0) {
     (void)pin0; /* por si compilador se queja en otras variantes */
 }
 
-void I2C::delayHalf() {
-    for (volatile uint32_t i=0; i<halfDelayCycles; ++i) __NOP();
-}
 
 bool I2C::clockHighWait() {
     scl_hi();

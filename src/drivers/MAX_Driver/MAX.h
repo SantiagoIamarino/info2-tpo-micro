@@ -35,6 +35,9 @@ static const uint8_t MAX_ADDR         = 0x57;
 #define REG_MULTI_LED_2   0x12   // SLOT2
 #define REG_PART_ID       0xFF
 
+const uint8_t PPM_MIN_VALID = 40;
+const uint8_t PPM_MAX_VALID = 150;
+
 class MAX {
 public:
 	MAX();

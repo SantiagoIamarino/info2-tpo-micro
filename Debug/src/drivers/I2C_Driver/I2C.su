@@ -4,14 +4,13 @@
 ../src/drivers/I2C_Driver/I2C.h:33:17:void I2C::scl_lo()	16	static
 ../src/drivers/I2C_Driver/I2C.cpp:8:1:I2C::I2C(uint8_t, uint8_t, uint32_t)	24	static
 ../src/drivers/I2C_Driver/I2C.cpp:29:6:void I2C::ioconDigital(uint8_t)	0	static
-../src/drivers/I2C_Driver/I2C.cpp:33:6:void I2C::delayHalf()	8	static
-../src/drivers/I2C_Driver/I2C.cpp:37:6:bool I2C::clockHighWait()	16	static
-../src/drivers/I2C_Driver/I2C.cpp:48:6:void I2C::start()	8	static
-../src/drivers/I2C_Driver/I2C.cpp:54:6:void I2C::stop()	8	static
-../src/drivers/I2C_Driver/I2C.cpp:60:6:bool I2C::writeByte(uint8_t)	24	static
-../src/drivers/I2C_Driver/I2C.cpp:74:9:uint8_t I2C::readByte(bool)	32	static
-../src/drivers/I2C_Driver/I2C.cpp:90:6:bool I2C::writeBytes(uint8_t, const uint8_t*, uint32_t)	24	static
-../src/drivers/I2C_Driver/I2C.cpp:100:6:bool I2C::writeReg(uint8_t, uint8_t, uint8_t)	16	static
-../src/drivers/I2C_Driver/I2C.cpp:105:6:bool I2C::readReg(uint8_t, uint8_t, uint8_t&)	24	static
-../src/drivers/I2C_Driver/I2C.cpp:117:6:bool I2C::readBytes(uint8_t, uint8_t, uint8_t*, uint32_t)	24	static
-../src/drivers/I2C_Driver/I2C.cpp:130:6:bool I2C::scanOne(uint8_t)	16	static
+../src/drivers/I2C_Driver/I2C.cpp:34:6:bool I2C::clockHighWait()	16	static
+../src/drivers/I2C_Driver/I2C.cpp:45:6:void I2C::start()	8	static
+../src/drivers/I2C_Driver/I2C.cpp:51:6:void I2C::stop()	8	static
+../src/drivers/I2C_Driver/I2C.cpp:57:6:bool I2C::writeByte(uint8_t)	24	static
+../src/drivers/I2C_Driver/I2C.cpp:71:9:uint8_t I2C::readByte(bool)	32	static
+../src/drivers/I2C_Driver/I2C.cpp:87:6:bool I2C::writeBytes(uint8_t, const uint8_t*, uint32_t)	24	static
+../src/drivers/I2C_Driver/I2C.cpp:97:6:bool I2C::writeReg(uint8_t, uint8_t, uint8_t)	16	static
+../src/drivers/I2C_Driver/I2C.cpp:102:6:bool I2C::readReg(uint8_t, uint8_t, uint8_t&)	24	static
+../src/drivers/I2C_Driver/I2C.cpp:114:6:bool I2C::readBytes(uint8_t, uint8_t, uint8_t*, uint32_t)	24	static
+../src/drivers/I2C_Driver/I2C.cpp:127:6:bool I2C::scanOne(uint8_t)	16	static

@@ -48,6 +48,8 @@ enum State : uint8_t {
 		S_ALARMA_VAL,      // "0TRUE" | "FALSE"
 		S_K_LUZ,           // ";LUZ_ON="
 		S_LUZ_VAL,         // "TRUE" | "FALSE"
+		S_K_CHECKSUM,	   // ";CS="
+		S_SUM_CHECK,       // checkear valor en hexa, suma de toda la trama menos <>
 		S_WAIT_FINAL,      // '>'
 		S_DONE,
 		S_ERROR
@@ -55,9 +57,10 @@ enum State : uint8_t {
 
 const char* HEADER;
 const char* HEADER_UPDT = "CFG_UPDATE:PF_ID=";
-const char* K_HRS  = ";HORAS_SUENIO=";
-const char* K_ALR  = ";ALARMA_ON=";
-const char* K_LUZ  = ";LUZ_ON=";
+const char* K_HRS  		= ";HORAS_SUENIO=";
+const char* K_ALR  		= ";ALARMA_ON=";
+const char* K_LUZ  		= ";LUZ_ON=";
+const char* K_CHKSUM  	= ";CS=";
 
 State st = S_ESPERO_TRAMA;
 bool cfg_msg_done  = false;
@@ -71,18 +74,19 @@ uint8_t profile_id[2];
 uint8_t horas[2];
 uint8_t alarma_on[6];
 uint8_t luz_on[6];
+uint8_t cs_val[2];
+uint8_t cs_calc = 0;
 bool sensors_paused = false;
 
 uint8_t n_dec;
 uint8_t n_uni;
 
 
-void cfg_maq_estados( SuenioCFG* cfg, bool es_update){
+void cfg_maq_estados( int32_t b, SuenioCFG* cfg, bool es_update){
 	// Ejemplos validos:
-	// <CFG:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE>
-	// <CFG_UPDATE:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE>
+	// <CFG:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE;CS=NN>
+	// <CFG_UPDATE:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE;CS=NN>
 
-	int32_t b = Uart0.PopRx();
 	if(b < 0) {
 		if (st != S_ESPERO_TRAMA) {
 			// Esta en medio de una trama, cuento inactividad
@@ -104,13 +108,18 @@ void cfg_maq_estados( SuenioCFG* cfg, bool es_update){
 		return;
 	}
 
+	if(st != S_ESPERO_TRAMA && st != S_WAIT_FINAL && st != S_DONE && st != S_ERROR && st != S_K_CHECKSUM && st != S_SUM_CHECK){
+		// sumo para el checksum siempre que no sea principio, final, error, done o checksum
+		cs_calc += (uint8_t)b;
+	}
+
 
 	switch (st) {
 
 		case S_ESPERO_TRAMA: // <
 			if(sensors_paused){ MAX_SENSOR.resume(); MPU_ACC.resume(); sensors_paused = false; }
 
-			if (b == '<') { st = S_CHECK_COMANDO; index = 0; }
+			if (b == '<') { st = S_CHECK_COMANDO; index = 0; cs_calc = 0; }
 			break;
 
 		case S_CHECK_COMANDO: // "CFG:PF_ID="  ó  "CFG_UPDATE:PF_ID="
@@ -194,7 +203,31 @@ void cfg_maq_estados( SuenioCFG* cfg, bool es_update){
 
 			if(index == 5) {
 				luz_on[5] = '\0';
-				st = S_WAIT_FINAL; index = 0;
+				st = S_K_CHECKSUM; index = 0;
+			}
+			break;
+
+		case S_K_CHECKSUM:
+			if (b == K_CHKSUM[index]) {
+				index++;
+				if (K_CHKSUM[index] == '\0') { st = S_SUM_CHECK; index = 0; }
+			} else {
+				st = (b == '<') ? S_CHECK_COMANDO : S_ESPERO_TRAMA;
+				index = 0;
+			}
+			break;
+
+		case S_SUM_CHECK:
+			cs_val[index] = (uint8_t)b;
+			index++;
+
+			if (index == 2) {
+				index = 0;
+				if(hex_a_dec(cs_val) == cs_calc) { // checksum correcto
+					st = S_WAIT_FINAL;
+				} else {
+					st = S_ERROR;
+				}
 			}
 			break;
 
@@ -242,6 +275,7 @@ void cfg_maq_estados( SuenioCFG* cfg, bool es_update){
 		case S_ERROR:
 			st = S_ESPERO_TRAMA;
 			index = 0;
+			cs_calc = 0;
 			if (sensors_paused) {
 				MAX_SENSOR.resume();
 				MPU_ACC.resume();

@@ -12,6 +12,7 @@ class TIMER : public CALLBACK{
 private:
 	uint32_t time;
 	uint32_t timeReload;
+	bool stopped = false;
 
 	void (*func)(void);
 
@@ -22,7 +23,8 @@ public:
 
 	void Discount(void);
 
-	void Stop(void);
+	void Stop(void){stopped = true;};
+	void Resume(void){stopped = false;};
 
 	void Callback( void );
 };
