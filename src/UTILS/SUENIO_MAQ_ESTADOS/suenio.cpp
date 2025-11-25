@@ -6,7 +6,7 @@
 #define LIMITE_PULSO_DORMIDO 		100 // pulsaciones por minuto
 #define SIN_MOVIMIENTO_SEG 			10 // en segundos
 #define PULSO_DEBAJO_LIMITE_SEG		10 // en segundos
-#define TIEMPO_DESPERTAR_HARDCODE   10 // 0 para no hardcodear
+#define TIEMPO_DESPERTAR_HARDCODE   0 // 0 para no hardcodear
 
 #define ESTADO_DESPIERTO 0
 #define ESTADO_DORMIDO 1
@@ -63,7 +63,14 @@ void suenio_maq_estados(SuenioCFG* suenio_config) {
 			// empiezo a descontar el tiempo (en suenio_tick_timer) hasta activar los actuadores
 			// Envia informacion fisiologica LPC->ESP_32->PC
 			if(tiempo_hasta_despertar == -1) { // primera vez que entra, seteo el tiempo que falta hasta despertar (en segundos)
-				tiempo_hasta_despertar = (int32_t)suenio_config->horas_suenio * (int32_t)(60 * 60) ;
+
+				tiempo_hasta_despertar = (int32_t)suenio_config->horas_suenio * (int32_t)(60 * 60);
+
+				if(suenio_config->hora_limite_seg > 0 && suenio_config->hora_limite_seg < tiempo_hasta_despertar) {
+					// Si la hora limite es menor a las horas de suenio deseadas seteo hora limite
+					tiempo_hasta_despertar = suenio_config->hora_limite_seg;
+				}
+
 				if(TIEMPO_DESPERTAR_HARDCODE > 0){ // en el caso que necesite hardcodear el tiempo hasta despertar (pruebas/debug)
 					tiempo_hasta_despertar = TIEMPO_DESPERTAR_HARDCODE;
 				}
@@ -155,6 +162,8 @@ void suenio_tick(void) {
 			return;
 		}
 
+		tiempo_hasta_despertar--;
+
 		if(MAX_SENSOR.Get_PPM() > PPM_MIN_VALID && MAX_SENSOR.Get_PPM() < PPM_MAX_VALID) {
 			if(sumatoria_ppm > 0) {
 				sumatoria_ppm += MAX_SENSOR.Get_PPM();
@@ -162,13 +171,17 @@ void suenio_tick(void) {
 				sumatoria_ppm = MAX_SENSOR.Get_PPM();
 			}
 
-			tiempo_hasta_despertar--;
-
 			if(++log_counter >= INFO_FISIOLOGICA_CADA) {
 				enviar_info_fisiologica(tiempo_hasta_despertar);
 				log_counter = 0;
 			}
 		}
+	}
+}
+
+void hora_limite_tick(void) {
+	if(suenio_cfg->hora_limite_seg > 0){
+		suenio_cfg->hora_limite_seg--;
 	}
 }
 

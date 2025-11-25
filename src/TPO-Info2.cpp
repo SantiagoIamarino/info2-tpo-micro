@@ -6,10 +6,9 @@ MPU MPU_ACC;
 PC_CON PC_CONNECTION;
 
 SuenioCFG suenio_config;
+TIMER hora_limite_t(10, 1000, hora_limite_tick);
 
 GPIOF Pulsador(PIN_PULSADOR);
-GPIOPWM Ledd(0, 22);
-Gpio Buzzerr(0, 19, OUTPUT);
 
 int main(void) {
 

@@ -28,7 +28,13 @@ static void Log_SuenioCFG(const SuenioCFG* c) {
     uart_print_str(c->alarma_on ? "TRUE" : "FALSE");
     uart_print_str("; LUZ=");
     uart_print_str(c->luz_on ? "TRUE" : "FALSE");
-    uart_print_str("\r\n");
+    uart_print_str("; HORA_LIMITE_SEG=");
+
+    char buf[32];
+	// convertir uint32_t a string
+	int n = sprintf(buf, "%lu", (unsigned long)c->hora_limite_seg);
+	Uart0.Send((uint8_t*)buf, n);
+
 }
 
 extern MAX MAX_SENSOR;
@@ -48,6 +54,8 @@ enum State : uint8_t {
 		S_ALARMA_VAL,      // "0TRUE" | "FALSE"
 		S_K_LUZ,           // ";LUZ_ON="
 		S_LUZ_VAL,         // "TRUE" | "FALSE"
+		S_K_HORA_LIM,	   // ;HORA_LIMITE=
+		S_K_HORA_LIM_VAL,  // HH:MM:SS
 		S_K_CHECKSUM,	   // ";CS="
 		S_SUM_CHECK,       // checkear valor en hexa, suma de toda la trama menos <>
 		S_WAIT_FINAL,      // '>'
@@ -60,6 +68,7 @@ const char* HEADER_UPDT = "CFG_UPDATE:PF_ID=";
 const char* K_HRS  		= ";HORAS_SUENIO=";
 const char* K_ALR  		= ";ALARMA_ON=";
 const char* K_LUZ  		= ";LUZ_ON=";
+const char* K_HORA_LIM  = ";HORA_LIMITE=";
 const char* K_CHKSUM  	= ";CS=";
 
 State st = S_ESPERO_TRAMA;
@@ -74,6 +83,7 @@ uint8_t profile_id[2];
 uint8_t horas[2];
 uint8_t alarma_on[6];
 uint8_t luz_on[6];
+uint8_t hora_limite[9];
 uint8_t cs_val[2];
 uint8_t cs_calc = 0;
 bool sensors_paused = false;
@@ -84,8 +94,8 @@ uint8_t n_uni;
 
 void cfg_maq_estados( int32_t b, SuenioCFG* cfg, bool es_update){
 	// Ejemplos validos:
-	// <CFG:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE;CS=NN>
-	// <CFG_UPDATE:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE;CS=NN>
+	// <CFG:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE;HORA_LIMITE=HH:MM:SS;CS=NN>
+	// <CFG_UPDATE:PF_ID=01;HORAS_SUENIO=08;ALARMA_ON=TRUE;LUZ_ON=FALSE;HORA_LIMITE=HH:MM:SS;CS=NN>
 
 	if(b < 0) {
 		if (st != S_ESPERO_TRAMA) {
@@ -203,6 +213,26 @@ void cfg_maq_estados( int32_t b, SuenioCFG* cfg, bool es_update){
 
 			if(index == 5) {
 				luz_on[5] = '\0';
+				st = S_K_HORA_LIM; index = 0;
+			}
+			break;
+
+		case S_K_HORA_LIM: // ";HORA_LIMITE=
+			if (b == K_HORA_LIM[index]) {
+				index++;
+				if (K_HORA_LIM[index] == '\0') { st = S_K_HORA_LIM_VAL; index = 0; }
+			} else {
+				st = (b == '<') ? S_CHECK_COMANDO : S_ESPERO_TRAMA;
+				index = 0;
+			}
+			break;
+
+		case S_K_HORA_LIM_VAL: // HH:MM:SS
+			hora_limite[index] = b;
+			index++;
+
+			if(index == 8) {
+				hora_limite[8] = '\0';
 				st = S_K_CHECKSUM; index = 0;
 			}
 			break;
@@ -236,7 +266,9 @@ void cfg_maq_estados( int32_t b, SuenioCFG* cfg, bool es_update){
 			else { st = S_ERROR; }
 			break;
 
-		case S_DONE:
+		case S_DONE: {
+			Uart0.Send((uint8_t*)"<CFG_ACK>", 0 );
+
 			st = S_ESPERO_TRAMA;
 			index = 0;
 
@@ -264,6 +296,12 @@ void cfg_maq_estados( int32_t b, SuenioCFG* cfg, bool es_update){
 				cfg->luz_on = false;
 			} else { st = S_ERROR; }
 
+			// HORA_LIMITE convertir HH:MM:SS (restantes) a segundos, se ira restando con un timer
+			int HH = (hora_limite[0] - '0') * 10 + (hora_limite[1] - '0');
+			int MM = (hora_limite[3] - '0') * 10 + (hora_limite[4] - '0');
+			int SS = (hora_limite[6] - '0') * 10 + (hora_limite[7] - '0');
+
+			cfg->hora_limite_seg = (uint32_t)(HH * 3600 + MM * 60 + SS);
 
 			Log_SuenioCFG(cfg);
 
@@ -272,6 +310,7 @@ void cfg_maq_estados( int32_t b, SuenioCFG* cfg, bool es_update){
 			cfg_msg_error = false;
 
 			break;
+		}
 		case S_ERROR:
 			st = S_ESPERO_TRAMA;
 			index = 0;

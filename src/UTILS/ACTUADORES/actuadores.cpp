@@ -3,8 +3,8 @@
 extern MAX MAX_SENSOR;
 extern MPU MPU_ACC;
 
-GPIOPWM Led(0, 20);
-Gpio Buzzer(0, 22, OUTPUT);
+GPIOPWM Led(0, 22);
+Gpio Buzzer(0, 19, OUTPUT);
 TIMER t_actuadores(10, 1, tick_actuadores);
 
 static uint8_t pwm_luz_level = 1;

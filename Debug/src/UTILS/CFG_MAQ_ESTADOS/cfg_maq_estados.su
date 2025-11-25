@@ -1,3 +1,3 @@
-../src/UTILS/CFG_MAQ_ESTADOS/cfg_maq_estados.cpp:16:13:void uart_print_u8_2(uint8_t)	16	static
 ../src/UTILS/CFG_MAQ_ESTADOS/cfg_maq_estados.cpp:12:13:void uart_print_str(const char*)	8	static
-../src/UTILS/CFG_MAQ_ESTADOS/cfg_maq_estados.cpp:85:6:void cfg_maq_estados(int32_t, SuenioCFG*, bool)	32	static
+../src/UTILS/CFG_MAQ_ESTADOS/cfg_maq_estados.cpp:16:13:void uart_print_u8_2(uint8_t)	16	static
+../src/UTILS/CFG_MAQ_ESTADOS/cfg_maq_estados.cpp:95:6:void cfg_maq_estados(int32_t, SuenioCFG*, bool)	64	static

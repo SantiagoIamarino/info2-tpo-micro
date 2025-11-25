@@ -30,5 +30,6 @@ void suenio_maq_estados(SuenioCFG* suenio_config);
 void suenio_tick(void);
 void despertar_tick(void);
 void reset_maq_estados(void);
+void hora_limite_tick(void);
 
 #endif /* UTILS_SUENIO_MAQ_ESTADOS_SUENIO_H_ */

@@ -24,6 +24,7 @@ struct SuenioCFG {
     uint8_t horas_suenio;
     bool alarma_on;
     bool luz_on;
+    uint32_t hora_limite_seg;
 };
 
 class PC_CON {

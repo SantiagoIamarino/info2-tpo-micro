@@ -1,4 +1,5 @@
 ../src/UTILS/SUENIO_MAQ_ESTADOS/suenio.cpp:35:6:void reset_maq_estados()	0	static
 ../src/UTILS/SUENIO_MAQ_ESTADOS/suenio.cpp:44:6:void suenio_maq_estados(SuenioCFG*)	16	static
-../src/UTILS/SUENIO_MAQ_ESTADOS/suenio.cpp:98:6:void enviar_info_fisiologica(uint32_t)	104	static
-../src/UTILS/SUENIO_MAQ_ESTADOS/suenio.cpp:136:6:void suenio_tick()	16	static
+../src/UTILS/SUENIO_MAQ_ESTADOS/suenio.cpp:105:6:void enviar_info_fisiologica(uint32_t)	104	static
+../src/UTILS/SUENIO_MAQ_ESTADOS/suenio.cpp:143:6:void suenio_tick()	16	static
+../src/UTILS/SUENIO_MAQ_ESTADOS/suenio.cpp:182:6:void hora_limite_tick()	0	static

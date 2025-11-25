@@ -1,3 +1,3 @@
 /Users/santiagoiamarino/Documents/MCUXpressoIDE_24.12.148/workspace/TPO-Info2/src/UTILS/TRAMAS/tramas.h:20:6:void analizar_tramas(SuenioCFG*)	32	static
-../src/TPO-Info2.cpp:14:5:int main()	16	static
-../src/TPO-Info2.cpp:31:1:cpp)	16	static
+../src/TPO-Info2.cpp:13:5:int main()	16	static
+../src/TPO-Info2.cpp:30:1:cpp)	16	static

@@ -138,10 +138,6 @@ bool PC_CON::Obtener_Configuracion(SuenioCFG* cfg){
 
 	this->Enviar_Comando((uint8_t*)"<REQ_CONFIG>");
 
-	if(!this->Leer_Resp_Con_Reintentos((uint8_t*)"<ACK_REQ_CONFIG>")){
-		return false;
-	}
-
 	uint32_t timeout = MAX_NO_RESP_COUNTER;
 	while (timeout--) { // bloqueante, usar solo en la inicializacion
 		int32_t b = Uart0.PopRx();
